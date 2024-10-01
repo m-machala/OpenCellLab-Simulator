@@ -1,6 +1,6 @@
-from CellBrain import CellBrain
-from CellData import CellData
-from Environment import Environment
+from base_classes.base.CellBrain import CellBrain
+from base_classes.base.CellData import CellData
+from base_classes.base.Environment import Environment
 
 # This class represents a generic cell. It contains references to its brain and data classes.
 # It also contains a reference to the environment used in the execute function.
@@ -10,6 +10,11 @@ class Cell:
         self.cellData = cellData
         self.cellBrain = cellBrain
         self.environment = environment
+
+        print("Init cell " + str(self))
+        print("Brain " + str(self.cellBrain))
+        print("Data " + str(self.cellData))
+        print()
 
     def execute(self):
         self.cellBrain.run(self.environment)
