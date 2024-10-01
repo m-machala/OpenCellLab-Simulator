@@ -8,13 +8,13 @@ from base_classes.base.Environment import Environment
 class Cell:
     def __init__(self, cellData: CellData, cellBrain: CellBrain, environment: Environment):
         self.cellData = cellData
-        self.cellBrain = cellBrain
+        self._cellBrain = cellBrain
         self.environment = environment
 
         print("Init cell " + str(self))
-        print("Brain " + str(self.cellBrain))
+        print("Brain " + str(self._cellBrain))
         print("Data " + str(self.cellData))
         print()
 
     def execute(self):
-        self.cellBrain.run(self.environment)
+        self._cellBrain.run(self.environment)
