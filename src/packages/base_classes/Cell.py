@@ -1,7 +1,9 @@
+
+
 # This class represents a generic cell. It contains references to its brain and data classes.
 class Cell:
-    def __init__(self, cellData, cellBrain):
-        self.cellData = cellData
+    def __init__(self, cellBrain):
+        self.cellData = {}
         self.cellBrain = cellBrain
 
     def execute(self):
