@@ -2,6 +2,7 @@ from packages.base_classes.Environment import Environment
 from packages.base_classes.Cell import Cell
 
 class Simple2DEnvironment(Environment):
+
     def cellsCycled(self):
         pass
 
@@ -27,7 +28,9 @@ class Simple2DEnvironment(Environment):
         newCell = Cell(newCellBrain)
         newCell.cellData["xPosition"] = currentCell.cellData["xPosition"] + relativeXCoordinate
         newCell.cellData["yPosition"] = currentCell.cellData["yPosition"] + relativeYCoordinate
+        newCell.cellData["color"] = (0, 255, 128)
+
+        self._cellExecutor.addCell(newCell)
 
     def deleteCurrentCell(self):
-        currentCell = self._cellExecutor.currentCell
-        currentCell.cellBrain = None
+        self._cellExecutor.removeCell(self._cellExecutor.currentCell)

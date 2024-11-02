@@ -18,6 +18,9 @@ class Simple2DRenderer(Renderer):
             ]
 
     def render(self, simple2DCellList):
+        for cell in simple2DCellList:
+            print(cell.cellBrain)
+        print("----------")
         outputBaseWidth = self.outputResolutionW
         outputBaseHeight = self.outputResolutionH
 
@@ -30,7 +33,7 @@ class Simple2DRenderer(Renderer):
         outputImagePixels = outputImage.load()
 
         for cell in simple2DCellList:
-            if gridLeftBound <= cell.cellData["xPosition"] <= gridRightBound and gridTopBound <= cell.cellData["yPosition"] <= gridBottomBound:
+            if gridLeftBound <= cell.cellData["xPosition"] < gridRightBound and gridTopBound <= cell.cellData["yPosition"] < gridBottomBound:
                 outputImagePixels[cell.cellData["xPosition"] - gridLeftBound, cell.cellData["yPosition"] - gridTopBound] = cell.cellData["color"]
         
         return outputImage
