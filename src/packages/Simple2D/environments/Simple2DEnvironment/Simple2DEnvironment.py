@@ -28,8 +28,8 @@ class Simple2DEnvironment(Environment):
         newCell = Cell(newCellBrain)
         newCell.cellData["xPosition"] = currentCell.cellData["xPosition"] + relativeXCoordinate
         newCell.cellData["yPosition"] = currentCell.cellData["yPosition"] + relativeYCoordinate
-        if hasattr(type(newCellBrain), "color"):
-            newCell.cellData["color"] = type(newCellBrain).color
+        if hasattr(type(newCellBrain), "COLOR"):
+            newCell.cellData["color"] = type(newCellBrain).COLOR
         else:
             newCell.cellData["color"] = (255, 255, 255)
 

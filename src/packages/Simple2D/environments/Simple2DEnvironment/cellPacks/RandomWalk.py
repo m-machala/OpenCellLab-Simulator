@@ -2,7 +2,7 @@ from packages.base_classes.CellBrain import CellBrain
 import random
 
 class RandomWalk(CellBrain):
-    color = (255, 0, 0)
+    COLOR = (255, 0, 0)
 
     def __init__(self, environment, previousDirection = 0):
         super().__init__(environment)
