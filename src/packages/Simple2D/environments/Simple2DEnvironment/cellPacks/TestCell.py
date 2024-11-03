@@ -1,7 +1,7 @@
 from packages.base_classes.CellBrain import CellBrain
-from packages.Simple2D.environments.Simple2DEnvironment import Simple2DEnvironment
 
 class TestCell(CellBrain):
+    color = (0, 255, 127)
     def run(self):
         topCell = TestCell(self._environment)
         bottomCell = TestCell(self._environment)

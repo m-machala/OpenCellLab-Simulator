@@ -1,18 +1,25 @@
 from packages.Simple2D.environments.Simple2DEnvironment.Simple2DEnvironment import Simple2DEnvironment
 from packages.Simple2D.environments.Simple2DEnvironment.cellPacks.TestCell import TestCell
+from packages.Simple2D.environments.Simple2DEnvironment.cellPacks.RandomWalk import RandomWalk
 from packages.base_classes.Cell import Cell
 from packages.Simple2D.Simple2DRenderer import Simple2DRenderer
 from CellExecutor import CellExecutor
 
 environment = Simple2DEnvironment()
 
-firstCellBrain = TestCell(environment)
+firstCellBrain = RandomWalk(environment)
 firstCell = Cell(firstCellBrain)
-firstCell.cellData["color"] = (0, 255, 128)
-firstCell.cellData["xPosition"] = 0
+firstCell.cellData["xPosition"] = 5
 firstCell.cellData["yPosition"] = 0
+firstCell.cellData["color"] = RandomWalk.color
 
-executor = CellExecutor(environment, [firstCell])
+secondCellBrain = TestCell(environment)
+secondCell = Cell(secondCellBrain)
+secondCell.cellData["xPosition"] = -5
+secondCell.cellData["yPosition"] = 0
+secondCell.cellData["color"] = TestCell.color
+
+executor = CellExecutor(environment, [firstCell, secondCell])
 environment.setExecutor(executor)
 
 renderer = Simple2DRenderer(20, 20)
