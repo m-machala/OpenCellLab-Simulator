@@ -20,9 +20,9 @@ renderer = Simple2DRenderer(20, 20)
 frameCounter = 0
 
 image = renderer.render(executor.cellList)
-image.save("./" + str(frameCounter) + ".png")
+image.save("./tmp/" + str(frameCounter) + ".png")
 
-for frameCounter in range(1, 250):
+for frameCounter in range(1, 10):
     executor.cycleCells()
     image = renderer.render(executor.cellList)
-    image.save("./" + str(frameCounter) + ".png")
+    image.save("./tmp/" + str(frameCounter) + ".png")

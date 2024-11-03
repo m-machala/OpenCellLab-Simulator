@@ -18,9 +18,6 @@ class Simple2DRenderer(Renderer):
             ]
 
     def render(self, simple2DCellList):
-        for cell in simple2DCellList:
-            print(cell.cellBrain)
-        print("----------")
         outputBaseWidth = self.outputResolutionW
         outputBaseHeight = self.outputResolutionH
 
