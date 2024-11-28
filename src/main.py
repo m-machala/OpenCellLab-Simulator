@@ -22,7 +22,7 @@ frameCounter = 0
 image = renderer.render(executor.cellList)
 image.save("./tmp/" + str(frameCounter) + ".png")
 
-for frameCounter in range(1, 10):
+for frameCounter in range(1, 50):
     executor.cycleCells()
     image = renderer.render(executor.cellList)
     image.save("./tmp/" + str(frameCounter) + ".png")
