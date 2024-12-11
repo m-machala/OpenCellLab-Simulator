@@ -6,3 +6,4 @@ from CellExecutor import CellExecutor
 import ModuleFinder
 
 found = ModuleFinder.findPackageJSONs(".\\tmp")
+print(found)

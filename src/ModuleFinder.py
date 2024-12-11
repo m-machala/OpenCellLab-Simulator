@@ -12,9 +12,21 @@ def findAllJSONs(folderPath):
 
 validPackages = ["renderer", "environment", "cell"]
 def validatePackageJSON(JSON):
-    if "package type" in JSON and JSON["package type"] in validPackages:
-        return True
-    return False
+    output = False
+    if "package type" in JSON and JSON["package type"] in validPackages and "package name" in JSON and "package path" in JSON:
+        if JSON["package type"] == "cell" and "cell types" in JSON:
+            output = True
+            if len(JSON["cell types"]) < 0:
+                output = False
+            else:
+                for cellType in JSON["cell types"]:
+                    if not ("cell name" in cellType and "cell class" in cellType):
+                        output = False
+        else:
+            if "package class" in JSON:
+                output = True
+            
+    return output
 
 def findPackageJSONs(folderPath):
     JSONPaths = findAllJSONs(folderPath)
@@ -65,3 +77,12 @@ def removeJSONsWithoutDependencies(JSONList):
                 validCellPacks.append(cellPack)
 
     return (renderers, validEnvironments, validCellPacks)
+
+def loadRenderer(rendererJSON):
+    pass
+
+def loadEnvironment(environmentJSON):
+    pass
+
+def loadCellPack(cellPackJSON):
+    pass
