@@ -5,6 +5,4 @@ from packages.Simple2D.Simple2DRenderer import Simple2DRenderer
 from CellExecutor import CellExecutor
 import ModuleFinder
 
-found = ModuleFinder.findPackageJSONs(".\\")
-for JSON in found:
-    print(JSON)
+found = ModuleFinder.findPackageJSONs(".\\tmp")

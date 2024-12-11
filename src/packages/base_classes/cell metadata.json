@@ -5,10 +5,10 @@
 	"package description": "DESCRIPTION",
 	"package image path": "PATH",
 	"package path": "PATH",
-	"package class": "CLASS",
 	"environment class": "CLASS",
 	"cell types": [
 	{
+		"cell class": "CLASS"
 		"cell name": "CELL",
 		"cell description": "DESCRIPTION",
 		"cell image path": "PATH"
