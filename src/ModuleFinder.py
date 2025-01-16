@@ -1,6 +1,7 @@
 import os
 import json
 import importlib
+import importlib.util
 
 def findAllJSONs(folderPath):
     foundJSONs = []
@@ -79,10 +80,48 @@ def removeJSONsWithoutDependencies(JSONList):
     return (renderers, validEnvironments, validCellPacks)
 
 def loadRenderer(rendererJSON):
-    pass
+    moduleSpec = importlib.util.spec_from_file_location("LoadedRenderer", rendererJSON["package path"])
+    if moduleSpec is None:
+        return None
+    foundModule = importlib.util.module_from_spec(moduleSpec)
+
+    try:
+        moduleSpec.loader.exec_module(foundModule)
+        classReference = getattr(foundModule, rendererJSON["package class"])
+
+        return classReference
+    except Exception as e:
+        return None
 
 def loadEnvironment(environmentJSON):
-    pass
+    moduleSpec = importlib.util.spec_from_file_location("LoadedEnvironment", environmentJSON["package path"])
+    if moduleSpec is None:
+        return None   
+    foundModule = importlib.util.module_from_spec(moduleSpec)
+
+    try:
+        moduleSpec.loader.exec_module(foundModule)
+        classReference = getattr(foundModule, environmentJSON["package class"])
+
+        return classReference
+
+    except Exception as e:
+        return None
 
 def loadCellPack(cellPackJSON):
-    pass
+    cells = []
+    moduleSpec = importlib.util.spec_from_file_location("LoadedCellPack", cellPackJSON["package path"])
+    if moduleSpec is None:
+        return cells
+    
+    foundModule = importlib.util.module_from_spec(moduleSpec) 
+    try:
+        moduleSpec.loader.exec_module(foundModule)
+
+        for cellType in cellPackJSON["cell types"]:
+            classReference = getattr(foundModule, cellType["cell class"])
+            cells.append(classReference)
+
+    except Exception as e:
+        pass        
+    return cells

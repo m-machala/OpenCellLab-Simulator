@@ -6,4 +6,16 @@ from CellExecutor import CellExecutor
 import ModuleFinder
 
 found = ModuleFinder.findPackageJSONs(".\\tmp")
-print(found)
+renderer = ModuleFinder.filterJSONsByType(found, "renderer")[0]
+environment = ModuleFinder.filterJSONsByType(found, "environment")[0]
+cellPack = ModuleFinder.filterJSONsByType(found, "cell")[0]
+
+loadedRenderer = ModuleFinder.loadRenderer(renderer)
+loadedEnvironment = ModuleFinder.loadEnvironment(environment)
+loadedCellPack = ModuleFinder.loadCellPack(cellPack)
+
+print(loadedRenderer)
+print(loadedEnvironment)
+print(loadedCellPack)
+
+print(loadedCellPack[0].COLOR)
