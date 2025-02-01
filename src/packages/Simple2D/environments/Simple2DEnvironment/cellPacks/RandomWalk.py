@@ -1,4 +1,4 @@
-from packages.base_classes.CellBrain import CellBrain
+from base_classes.CellBrain import CellBrain
 import random
 
 class RandomWalk(CellBrain):

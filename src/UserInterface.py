@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidget, QTextEdit
+import ModuleFinder
 
 class WelcomeScreen(QWidget):
     def __init__(self):
@@ -24,6 +25,7 @@ class WelcomeScreen(QWidget):
         moduleListLayout.addWidget(moduleLabel)
 
         self.moduleList = QListWidget()
+        self.moduleList.itemClicked.connect(self.moduleClicked)
         moduleListLayout.addWidget(self.moduleList)
 
         # list of cell packs
@@ -34,6 +36,7 @@ class WelcomeScreen(QWidget):
         moduleInfoLayout.addWidget(cellLabel)
 
         self.cellList = QListWidget()
+        self.cellList.itemClicked.connect(self.cellPackClicked)
         moduleInfoLayout.addWidget(self.cellList)
 
         # info about modules
@@ -46,41 +49,107 @@ class WelcomeScreen(QWidget):
 
         # controls
         reloadButton = QPushButton("Reload")
+        reloadButton.clicked.connect(self.reloadClicked)
         mainLayout.addWidget(reloadButton)
 
         buttonLayout = QHBoxLayout()
         mainLayout.addLayout(buttonLayout)
 
         exitButton = QPushButton("Exit")
+        exitButton.clicked.connect(self.exitClicked)
         buttonLayout.addWidget(exitButton)
 
         buttonLayout.addStretch()
 
-        beginButton = QPushButton("Begin")
-        buttonLayout.addWidget(beginButton)
+        self.beginButton = QPushButton("Begin")
+        self.beginButton.setDisabled(True)
+        self.beginButton.clicked.connect(self.beginClicked)
+        buttonLayout.addWidget(self.beginButton)
 
         self.setLayout(mainLayout)
 
+        self.reloadClicked()
+
     def populateModuleList(self):
-        pass
+        packages = ModuleFinder.findPackageJSONs("..\\src\\packages")
+        self.moduleListItems = []
+        self.moduleList.clear()
 
-    def moduleClicked(self):
-        pass
+        renderers = ModuleFinder.filterJSONsByType(packages, "renderer")
+        environments = ModuleFinder.filterJSONsByType(packages, "environment")
 
-    def populateCellPackList(self):
-        pass
+        for renderer in renderers:
+            self.moduleList.addItem(renderer["package name"])
+            self.moduleListItems.append(renderer)
+            rendererClass = renderer["package class"]
 
-    def cellPackClicked(self):
-        pass
+            for environment in environments:
+                if rendererClass == environment["renderer class"]:
+                    self.moduleList.addItem("   " + environment["package name"])
+                    self.moduleListItems.append(environment)
+
+    def moduleClicked(self, item):
+        self.unselectCellPack()
+        moduleIndex = self.moduleList.row(item)
+        module = self.moduleListItems[moduleIndex]
+        if "package description" in module:
+            self.setModuleInfoText(module["package description"])
+        else:
+            self.setModuleInfoText("")
+
+        if module["package type"] == "environment":
+            self.populateCellPackList(module)
+        else:
+            self.cellList.clear()
+
+        self.beginButton.setDisabled(True)
+
+    def populateCellPackList(self, selectedModule):
+        self.cellList.clear()
+        self.cellListItems = []
+        if selectedModule["package type"] != "environment":
+            return
+        
+        modules = ModuleFinder.findPackageJSONs("..\\src\\packages")
+        cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
+
+        for cellPack in cellPacks:
+            if cellPack["environment class"] == selectedModule["package class"]:
+                self.cellList.addItem(cellPack["package name"])
+                self.cellListItems.append(cellPack)
+
+
+    def cellPackClicked(self, item):
+        packIndex = self.cellList.row(item)
+
+        module = self.cellListItems[packIndex]
+        if "package description" in module:
+            self.setModuleInfoText(module["package description"])
+        else:
+            self.setModuleInfoText("")
+        
+        self.beginButton.setEnabled(True)
 
     def setModuleInfoText(self, text):
-        pass
+        self.moduleInfo.setText(text)
 
     def reloadClicked(self):
-        pass
+        self.moduleList.clear()
+        self.cellList.clear()
+        self.unselectModule()
+        self.unselectCellPack()
+        self.setModuleInfoText("")
+        self.populateModuleList()
+        self.beginButton.setDisabled(True)
+
+    def unselectModule(self):
+        self.moduleList.clearSelection()
+
+    def unselectCellPack(self):
+        self.cellList.clearSelection()
 
     def beginClicked(self):
         pass
 
     def exitClicked(self):
-        pass
+        self.close()

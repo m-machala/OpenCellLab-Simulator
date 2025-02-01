@@ -1,4 +1,4 @@
-from packages.base_classes.CellBrain import CellBrain
+from base_classes.CellBrain import CellBrain
 
 class TestCell(CellBrain):
     COLOR = (0, 255, 127)
