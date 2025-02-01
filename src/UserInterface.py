@@ -6,6 +6,7 @@ class WelcomeScreen(QWidget):
 
         mainLayout = QVBoxLayout()
 
+        # introduction
         welcomeLabel = QLabel("Welcome to OCL!")
         mainLayout.addWidget(welcomeLabel)
 
@@ -15,37 +16,37 @@ class WelcomeScreen(QWidget):
         selectionLayout = QHBoxLayout()
         mainLayout.addLayout(selectionLayout)
 
-
+        # list of modules
         moduleListLayout = QVBoxLayout()
         selectionLayout.addLayout(moduleListLayout)
 
         moduleLabel = QLabel("Available modules:")
         moduleListLayout.addWidget(moduleLabel)
 
-        moduleList = QListWidget()
-        moduleListLayout.addWidget(moduleList)
+        self.moduleList = QListWidget()
+        moduleListLayout.addWidget(self.moduleList)
 
-
+        # list of cell packs
         moduleInfoLayout = QVBoxLayout()
         selectionLayout.addLayout(moduleInfoLayout)
 
         cellLabel = QLabel("Available cell packs:")
         moduleInfoLayout.addWidget(cellLabel)
 
-        cellList = QListWidget()
-        moduleInfoLayout.addWidget(cellList)
+        self.cellList = QListWidget()
+        moduleInfoLayout.addWidget(self.cellList)
 
+        # info about modules
         moduleLabel = QLabel("Selected module info:")
         moduleInfoLayout.addWidget(moduleLabel)
 
-        moduleInfo = QTextEdit()
-        moduleInfo.setReadOnly(True)
-        moduleInfoLayout.addWidget(moduleInfo)
+        self.moduleInfo = QTextEdit()
+        self.moduleInfo.setReadOnly(True)
+        moduleInfoLayout.addWidget(self.moduleInfo)
 
-
+        # controls
         reloadButton = QPushButton("Reload")
         mainLayout.addWidget(reloadButton)
-
 
         buttonLayout = QHBoxLayout()
         mainLayout.addLayout(buttonLayout)
@@ -59,3 +60,27 @@ class WelcomeScreen(QWidget):
         buttonLayout.addWidget(beginButton)
 
         self.setLayout(mainLayout)
+
+    def populateModuleList(self):
+        pass
+
+    def moduleClicked(self):
+        pass
+
+    def populateCellPackList(self):
+        pass
+
+    def cellPackClicked(self):
+        pass
+
+    def setModuleInfoText(self, text):
+        pass
+
+    def reloadClicked(self):
+        pass
+
+    def beginClicked(self):
+        pass
+
+    def exitClicked(self):
+        pass
