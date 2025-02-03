@@ -4,7 +4,7 @@
 	"author name": "AUTHOR",
 	"package description": "This pack contains a cell which created a growing pattern.",
 	"package image path": "PATH",
-	"package path": ".\\packages\\Simple2DEnvironment\\cellPacks\\TestCell.py",
+	"package path": "TestCell.py",
 	"environment class": "Simple2DEnvironment",
 	"cell types": [
 	{

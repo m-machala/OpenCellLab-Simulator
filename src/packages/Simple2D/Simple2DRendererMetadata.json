@@ -4,6 +4,6 @@
 	"author name": "AUTHOR",
 	"package description": "Renderer which renders cells in a 2D square grid.",
 	"package image path": "PATH",
-	"package path": ".\\packages\\Simple2DRenderer.py",
+	"package path": "Simple2DRenderer.py",
 	"package class": "Simple2DRenderer"
 }

@@ -4,7 +4,7 @@
 	"author name": "AUTHOR",
 	"package description": "This pack contains a cell which does a random walk.",
 	"package image path": "PATH",
-	"package path": ".\\packages\\Simple2DEnvironment\\cellPacks\\RandomWalk.py",
+	"package path": "RandomWalk.py",
 	"environment class": "Simple2DEnvironment",
 	"cell types": [
 	{

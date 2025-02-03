@@ -4,7 +4,7 @@
 	"author name": "AUTHOR",
 	"package description": "Environment for facilitating interactions between cells in a 2D square grid.",
 	"package image path": "PATH",
-	"package path": ".\\packages\\environment\\Simple2DEnvironment.py",
+	"package path": "Simple2DEnvironment.py",
 	"package class": "Simple2DEnvironment",
 	"renderer class": "Simple2DRenderer"
 }

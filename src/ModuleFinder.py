@@ -35,8 +35,8 @@ def findPackageJSONs(folderPath):
     for path in JSONPaths:
         with open(path, "r") as file:
             JSON = json.load(file)
-
             if validatePackageJSON(JSON):
+                JSON["package path"] = path + "\\" + JSON["package path"]
                 JSONs.append(JSON)
     return JSONs
 

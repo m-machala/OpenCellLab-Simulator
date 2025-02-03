@@ -4,7 +4,7 @@
 	"author name": "AUTHOR",
 	"package description": "This pack contains a cell which produces a spiral pattern.",
 	"package image path": "PATH",
-	"package path": ".\\packages\\Simple2DEnvironment\\cellPacks\\Pattern.py",
+	"package path": "Pattern.py",
 	"environment class": "Simple2DEnvironment",
 	"cell types": [
 	{
