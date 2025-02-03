@@ -1,12 +1,18 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidget, QTextEdit
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+    QPushButton, QListWidget, QTextEdit, QToolBar,
+    QMainWindow
+)
 import ModuleFinder
 import os
 
-class WelcomeScreen(QWidget):
+class WelcomeScreen(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        mainLayout = QVBoxLayout()
+        centralWidget = QWidget(self)
+        self.setCentralWidget(centralWidget)
+        mainLayout = QVBoxLayout(centralWidget)
 
         # introduction
         welcomeLabel = QLabel("Welcome to OCL!")
@@ -66,8 +72,6 @@ class WelcomeScreen(QWidget):
         self.beginButton.setDisabled(True)
         self.beginButton.clicked.connect(self.beginClicked)
         buttonLayout.addWidget(self.beginButton)
-
-        self.setLayout(mainLayout)
 
         self.reloadClicked()
 
@@ -154,3 +158,18 @@ class WelcomeScreen(QWidget):
 
     def exitClicked(self):
         self.close()
+
+class MainScreen(QMainWindow):
+    def __init__(self, rendererJSON, environmentJSON, cellPackJSONs):
+        pass
+        #mainLayout = QVBoxLayout()
+#
+        ## TODO: toolbar
+        #self.addToolbar
+#
+        #primaryLayout = QHBoxLayout()
+        #mainLayout.add
+#
+        #self.setLayout(mainLayout)
+
+    
