@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidget, QTextEdit
 import ModuleFinder
+import os
 
 class WelcomeScreen(QWidget):
     def __init__(self):
@@ -71,7 +72,7 @@ class WelcomeScreen(QWidget):
         self.reloadClicked()
 
     def populateModuleList(self):
-        packages = ModuleFinder.findPackageJSONs("..\\src\\packages")
+        packages = ModuleFinder.findPackageJSONs(os.path.dirname(os.path.abspath(__file__)) + "\\packages")
         self.moduleListItems = []
         self.moduleList.clear()
 
@@ -110,7 +111,7 @@ class WelcomeScreen(QWidget):
         if selectedModule["package type"] != "environment":
             return
         
-        modules = ModuleFinder.findPackageJSONs("..\\src\\packages")
+        modules = ModuleFinder.findPackageJSONs(os.path.dirname(os.path.abspath(__file__)) + "\\packages")
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
 
         for cellPack in cellPacks:
