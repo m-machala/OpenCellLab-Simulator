@@ -103,11 +103,12 @@ class WelcomeScreen(QMainWindow):
             self.setModuleInfoText("")
 
         if module["package type"] == "environment":
+            self.beginButton.setEnabled(True)
             self.populateCellPackList(module)
         else:
+            self.beginButton.setDisabled(True)
             self.cellList.clear()
 
-        self.beginButton.setDisabled(True)
 
     def populateCellPackList(self, selectedModule):
         self.cellList.clear()
@@ -132,8 +133,6 @@ class WelcomeScreen(QMainWindow):
             self.setModuleInfoText(module["package description"])
         else:
             self.setModuleInfoText("")
-        
-        self.beginButton.setEnabled(True)
 
     def setModuleInfoText(self, text):
         self.moduleInfo.setText(text)
@@ -157,19 +156,17 @@ class WelcomeScreen(QMainWindow):
         pass
 
     def exitClicked(self):
-        self.close()
+        self.close()  
 
 class MainScreen(QMainWindow):
     def __init__(self, rendererJSON, environmentJSON, cellPackJSONs):
-        pass
-        #mainLayout = QVBoxLayout()
-#
-        ## TODO: toolbar
-        #self.addToolbar
-#
-        #primaryLayout = QHBoxLayout()
-        #mainLayout.add
-#
-        #self.setLayout(mainLayout)
+        centralWidget = QWidget(self)
+        self.setCentralWidget(centralWidget)
+        mainLayout = QVBoxLayout(centralWidget)
 
-    
+        # TODO: toolbar
+
+        primaryLayout = QHBoxLayout()
+        mainLayout.addLayout(primaryLayout)
+
+        
