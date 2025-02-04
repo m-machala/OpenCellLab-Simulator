@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QListWidget, QTextEdit, QToolBar,
-    QMainWindow
+    QMainWindow, QGridLayout, QScrollArea
 )
 import ModuleFinder
 import os
@@ -159,14 +159,82 @@ class WelcomeScreen(QMainWindow):
         self.close()  
 
 class MainScreen(QMainWindow):
-    def __init__(self, rendererJSON, environmentJSON, cellPackJSONs):
+    def __init__(self):
+        super().__init__()
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
-        mainLayout = QVBoxLayout(centralWidget)
+        mainLayout = QHBoxLayout(centralWidget)
 
-        # TODO: toolbar
+        toolbar = QToolBar()
+        self.addToolBar(toolbar)
 
-        primaryLayout = QHBoxLayout()
-        mainLayout.addLayout(primaryLayout)
+        simucellLayout = QVBoxLayout()
+        mainLayout.addLayout(simucellLayout, 2)
+
+        # simulation
+
+        simulationLabel = QLabel("Simulation")
+        simucellLayout.addWidget(simulationLabel)
+
+        self.simulationImageLabel = QLabel()
+        simucellLayout.addWidget(self.simulationImageLabel, 3)
+
+        # cells
+
+        cellLayout = QHBoxLayout()
+        simucellLayout.addLayout(cellLayout, 2)
+
+        cellListOuterLayout = QVBoxLayout()
+        cellLayout.addLayout(cellListOuterLayout, 2)
+
+        cellLabel = QLabel("Cells")
+        cellListOuterLayout.addWidget(cellLabel)
+
+        cellList = QScrollArea()
+        cellListInnerLayout = QVBoxLayout()
+        cellList.setLayout(cellListInnerLayout)
+        cellListOuterLayout.addWidget(cellList)
+
+        cellInfoLayout = QVBoxLayout()
+        cellLayout.addLayout(cellInfoLayout, 1)
+
+        cellInfoLabel = QLabel("Cell info")
+        cellInfoLayout.addWidget(cellInfoLabel)
+
+        self.cellInfo = QTextEdit()
+        self.cellInfo.setReadOnly(True)
+        cellInfoLayout.addWidget(self.cellInfo)
+
+
+        # export functions
+
+        exportLayout = QHBoxLayout()
+        mainLayout.addLayout(exportLayout, 1)
+
+        # environment exports
+
+        environmentExportsOuterLayout = QVBoxLayout()
+        exportLayout.addLayout(environmentExportsOuterLayout, 1)
+
+        environmentExportsLabel = QLabel("Environment Settings")
+        environmentExportsOuterLayout.addWidget(environmentExportsLabel)
+
+        environmentExports = QScrollArea()
+        environmentExportsInnerLayout = QVBoxLayout()
+        environmentExports.setLayout(environmentExportsInnerLayout)
+        environmentExportsOuterLayout.addWidget(environmentExports)
+
+        # renderer exports
+
+        rendererExportsOuterLayout = QVBoxLayout()
+        exportLayout.addLayout(rendererExportsOuterLayout, 1)
+
+        rendererExportsLabel = QLabel("Renderer Settings")
+        rendererExportsOuterLayout.addWidget(rendererExportsLabel)
+
+        rendererExports = QScrollArea()
+        rendererExportsInnerLayout = QVBoxLayout()
+        rendererExports.setLayout(rendererExportsInnerLayout)
+        rendererExportsOuterLayout.addWidget(rendererExports)
 
         
