@@ -191,8 +191,11 @@ class MainScreen(QMainWindow):
         cellListOuterLayout.addWidget(cellLabel)
 
         cellList = QScrollArea()
+        cellListContainer = QWidget()
+        cellList.setWidget(cellListContainer)
+
         cellListInnerLayout = QVBoxLayout()
-        cellList.setLayout(cellListInnerLayout)
+        cellListContainer.setLayout(cellListInnerLayout)
         cellListOuterLayout.addWidget(cellList)
 
         cellInfoLayout = QVBoxLayout()
