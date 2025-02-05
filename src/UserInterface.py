@@ -220,8 +220,13 @@ class MainScreen(QMainWindow):
         environmentExportsOuterLayout.addWidget(environmentExportsLabel)
 
         environmentExports = QScrollArea()
+        environmentExports.setWidgetResizable(True)
+        environmentExportsContainer = QWidget()
+        environmentExports.setWidget(environmentExportsContainer)
+
         environmentExportsInnerLayout = QVBoxLayout()
-        environmentExports.setLayout(environmentExportsInnerLayout)
+        environmentExportsContainer.setLayout(environmentExportsInnerLayout)
+
         environmentExportsOuterLayout.addWidget(environmentExports)
 
         # renderer exports
@@ -233,8 +238,13 @@ class MainScreen(QMainWindow):
         rendererExportsOuterLayout.addWidget(rendererExportsLabel)
 
         rendererExports = QScrollArea()
+        rendererExports.setWidgetResizable(True)
+        rendererExportsContainer = QWidget()
+        rendererExports.setWidget(rendererExportsContainer)
+
         rendererExportsInnerLayout = QVBoxLayout()
-        rendererExports.setLayout(rendererExportsInnerLayout)
+        rendererExportsContainer.setLayout(rendererExportsInnerLayout)
+
         rendererExportsOuterLayout.addWidget(rendererExports)
 
         
