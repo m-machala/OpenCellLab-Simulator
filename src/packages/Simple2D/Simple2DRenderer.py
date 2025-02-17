@@ -1,5 +1,5 @@
 from PIL import Image
-from packages.base_classes.Renderer import Renderer
+from base_classes.Renderer import Renderer
 
 class Simple2DRenderer(Renderer):
     def __init__(self, outputResolutionW, outputResolutionH):

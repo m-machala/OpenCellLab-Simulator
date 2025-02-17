@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QListWidget, QTextEdit, QToolBar,
-    QMainWindow, QGridLayout, QScrollArea
+    QMainWindow, QGridLayout, QScrollArea, QGroupBox
 )
 import ModuleFinder
 import os
+from CellExecutor import CellExecutor
 
 class WelcomeScreen(QMainWindow):
     def __init__(self):
@@ -32,7 +33,7 @@ class WelcomeScreen(QMainWindow):
         moduleListLayout.addWidget(moduleLabel)
 
         self.moduleList = QListWidget()
-        self.moduleList.itemClicked.connect(self.moduleClicked)
+        self.moduleList.currentItemChanged.connect(self.moduleSelectionChanged)
         moduleListLayout.addWidget(self.moduleList)
 
         # list of cell packs
@@ -43,7 +44,7 @@ class WelcomeScreen(QMainWindow):
         moduleInfoLayout.addWidget(cellLabel)
 
         self.cellList = QListWidget()
-        self.cellList.itemClicked.connect(self.cellPackClicked)
+        self.cellList.currentItemChanged.connect(self.cellPackSelectionChanged)
         moduleInfoLayout.addWidget(self.cellList)
 
         # info about modules
@@ -93,7 +94,7 @@ class WelcomeScreen(QMainWindow):
                     self.moduleList.addItem("   " + environment["package name"])
                     self.moduleListItems.append(environment)
 
-    def moduleClicked(self, item):
+    def moduleSelectionChanged(self, item):
         self.unselectCellPack()
         moduleIndex = self.moduleList.row(item)
         module = self.moduleListItems[moduleIndex]
@@ -125,7 +126,7 @@ class WelcomeScreen(QMainWindow):
                 self.cellListItems.append(cellPack)
 
 
-    def cellPackClicked(self, item):
+    def cellPackSelectionChanged(self, item):
         packIndex = self.cellList.row(item)
 
         module = self.cellListItems[packIndex]
@@ -159,7 +160,7 @@ class WelcomeScreen(QMainWindow):
         self.close()  
 
 class MainScreen(QMainWindow):
-    def __init__(self):
+    def __init__(self, rendererData, environmentData, cellPackDataList):
         super().__init__()
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
@@ -190,19 +191,15 @@ class MainScreen(QMainWindow):
         cellLabel = QLabel("Cells")
         cellListOuterLayout.addWidget(cellLabel)
 
-        cellList = QScrollArea()
-        cellListContainer = QWidget()
-        cellList.setWidget(cellListContainer)
-
-        cellListInnerLayout = QVBoxLayout()
-        cellListContainer.setLayout(cellListInnerLayout)
-        cellListOuterLayout.addWidget(cellList)
+        self.cellListWidget = QListWidget()
+        self.cellListWidget.currentItemChanged.connect(self.cellListSelectionChanged)
+        cellListOuterLayout.addWidget(self.cellListWidget)
 
         cellInfoLayout = QVBoxLayout()
         cellLayout.addLayout(cellInfoLayout, 1)
 
-        cellInfoLabel = QLabel("Cell info")
-        cellInfoLayout.addWidget(cellInfoLabel)
+        self.cellInfoLabel = QLabel("Cell info")
+        cellInfoLayout.addWidget(self.cellInfoLabel)
 
         self.cellInfo = QTextEdit()
         self.cellInfo.setReadOnly(True)
@@ -227,8 +224,8 @@ class MainScreen(QMainWindow):
         environmentExportsContainer = QWidget()
         environmentExports.setWidget(environmentExportsContainer)
 
-        environmentExportsInnerLayout = QVBoxLayout()
-        environmentExportsContainer.setLayout(environmentExportsInnerLayout)
+        self.environmentExportsInnerLayout = QVBoxLayout()
+        environmentExportsContainer.setLayout(self.environmentExportsInnerLayout)
 
         environmentExportsOuterLayout.addWidget(environmentExports)
 
@@ -245,9 +242,57 @@ class MainScreen(QMainWindow):
         rendererExportsContainer = QWidget()
         rendererExports.setWidget(rendererExportsContainer)
 
-        rendererExportsInnerLayout = QVBoxLayout()
-        rendererExportsContainer.setLayout(rendererExportsInnerLayout)
+        self.rendererExportsInnerLayout = QVBoxLayout()
+        rendererExportsContainer.setLayout(self.rendererExportsInnerLayout)
 
         rendererExportsOuterLayout.addWidget(rendererExports)
+
+        self.reload(rendererData, environmentData, cellPackDataList)
+
+    def reload(self, rendererData, environmentData, cellPackDataList):
+        rendererReference = ModuleFinder.loadRenderer(rendererData)
+        environmentReference = ModuleFinder.loadEnvironment(environmentData)
+
+        if rendererReference == None or environmentReference == None:
+            self.loadingFailed()
+            return
+        self.renderer = rendererReference(self.simulationImageLabel.width(), self.simulationImageLabel.height())
+        self.environment = environmentReference()
+
+        self.executor = CellExecutor(self.environment, [])
+        self.environment.setExecutor(self.executor)
+
+        if self.executor == None:
+            self.loadingFailed()
+            return
+
+        self.cellListWidget.clear()
+        self.cellList = []
+        for pack in cellPackDataList:
+            self.cellList.append((None, pack))
+            foundCells = ModuleFinder.loadCellPack(pack)
+            if len(foundCells) == 0:
+                continue
+
+            self.cellListWidget.addItem(pack["package name"])
+            for cellIndex in range(len(foundCells)):
+                self.cellListWidget.addItem("    " + foundCells[cellIndex][1]["cell name"])
+                self.cellList.append(foundCells[cellIndex])
+        
+    def loadingFailed(self):
+        print("Loading error")
+
+    def cellListSelectionChanged(self, item):
+        cellIndex = self.cellListWidget.row(item)
+        module = self.cellList[cellIndex]
+
+        if "package description" in module[1]:
+            self.cellInfo.setText(module[1]["package description"])
+
+        if "cell description" in module[1]:
+            self.cellInfo.setText(module[1]["cell description"])
+
+
+
 
         

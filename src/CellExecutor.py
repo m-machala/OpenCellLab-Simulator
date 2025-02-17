@@ -3,7 +3,7 @@
 class CellExecutor:
     def __init__(self, environment, initialCellList):
         self.cellList = initialCellList
-        self.currentCell = initialCellList[0]
+        self.currentCell = None
         self._environment = environment
 
     def cycleCells(self):
@@ -17,8 +17,9 @@ class CellExecutor:
         self._environment.cellsCycled()
 
     def addCell(self, cell):
-        if(cell.cellBrain == self.currentCell.cellBrain or cell.cellData == self.currentCell.cellData):
-            return
+        for livingCell in self.cellList:
+            if(cell.cellBrain == livingCell.cellBrain or cell.cellData == livingCell.cellData):
+                return
         
         self.cellList.insert(self.cellList.index(self.currentCell), cell)
 

@@ -1,5 +1,5 @@
-from packages.base_classes.Environment import Environment
-from packages.base_classes.Cell import Cell
+from base_classes.Environment import Environment
+from base_classes.Cell import Cell
 
 class Simple2DEnvironment(Environment):
 

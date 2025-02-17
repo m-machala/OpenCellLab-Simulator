@@ -36,7 +36,8 @@ def findPackageJSONs(folderPath):
         with open(path, "r") as file:
             JSON = json.load(file)
             if validatePackageJSON(JSON):
-                JSON["package path"] = path + "\\" + JSON["package path"]
+                directory = os.path.dirname(path)
+                JSON["package path"] = directory + "\\" + JSON["package path"]
                 JSONs.append(JSON)
     return JSONs
 
@@ -120,8 +121,9 @@ def loadCellPack(cellPackJSON):
 
         for cellType in cellPackJSON["cell types"]:
             classReference = getattr(foundModule, cellType["cell class"])
-            cells.append(classReference)
+            cells.append((classReference, cellType))
 
     except Exception as e:
         pass        
     return cells
+    
