@@ -1,5 +1,6 @@
 from PIL import Image
 from base_classes.Renderer import Renderer
+from ExportFunctions import ExportFunction, ControlElement
 
 class Simple2DRenderer(Renderer):
     def __init__(self, outputResolutionW, outputResolutionH):
@@ -9,13 +10,11 @@ class Simple2DRenderer(Renderer):
         self.yCenterPosition = 0
 
         self.exportFunctions = [
-            ("Move Up", self.moveUp),
-            ("Move Down", self.moveDown),
-            ("Move Left", self.moveLeft),
-            ("Move Right", self.moveRight)#,
-            #("Zoom In", self.zoomIn),
-            #("Zoom out", self.zoomOut)
-            ]
+            ExportFunction(self.moveUp, "Move up", ControlElement.BUTTON),
+            ExportFunction(self.moveDown, "Move down", ControlElement.BUTTON),
+            ExportFunction(self.moveLeft, "Move left", ControlElement.BUTTON),
+            ExportFunction(self.moveRight, "Move right", ControlElement.BUTTON)            
+        ]
 
     def render(self, simple2DCellList):
         outputBaseWidth = self.outputResolutionW

@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QListWidget, QTextEdit, QToolBar,
-    QMainWindow, QGridLayout, QScrollArea, QGroupBox
+    QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
+    QButtonGroup, QSlider, QSpinBox
 )
+from PyQt6.QtCore import Qt
 import ModuleFinder
 import os
 from CellExecutor import CellExecutor
+from ExportFunctions import ExportFunction, ControlElement
 
 class WelcomeScreen(QMainWindow):
     def __init__(self):
@@ -247,15 +250,21 @@ class MainScreen(QMainWindow):
 
         rendererExportsOuterLayout.addWidget(rendererExports)
 
+        self.radioGroupsRenderer = {}
+        self.radioGroupsEnvironment = {}
+
         self.reload(rendererData, environmentData, cellPackDataList)
 
     def reload(self, rendererData, environmentData, cellPackDataList):
+        # get references to main modules
         rendererReference = ModuleFinder.loadRenderer(rendererData)
         environmentReference = ModuleFinder.loadEnvironment(environmentData)
 
         if rendererReference == None or environmentReference == None:
             self.loadingFailed()
             return
+        
+        # instantiate main modules and connect them
         self.renderer = rendererReference(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.environment = environmentReference()
 
@@ -266,6 +275,7 @@ class MainScreen(QMainWindow):
             self.loadingFailed()
             return
 
+        # load cell list and save cell references
         self.cellListWidget.clear()
         self.cellList = []
         for pack in cellPackDataList:
@@ -278,6 +288,24 @@ class MainScreen(QMainWindow):
             for cellIndex in range(len(foundCells)):
                 self.cellListWidget.addItem("    " + foundCells[cellIndex][1]["cell name"])
                 self.cellList.append(foundCells[cellIndex])
+
+        # load export functions
+        # TODO: proper export cleaning
+
+        # renderer exports
+        self.radioGroupsRenderer = {}
+        for exportFunction in self.renderer.exportFunctions:
+            element = self.buildExportElement(exportFunction, self.radioGroupsRenderer)
+            self.rendererExportsInnerLayout.addWidget(element)
+        self.rendererExportsInnerLayout.addStretch(1)
+
+        # environment exports
+        self.radioGroupsEnvironment = {}
+        for exportFunction in self.environment.exportFunctions:
+            element = self.buildExportElement(exportFunction, self.radioGroupsEnvironment)
+            self.environmentExportsInnerLayout.addWidget(element)
+        self.environmentExportsInnerLayout.addStretch(1)
+
         
     def loadingFailed(self):
         print("Loading error")
@@ -292,7 +320,61 @@ class MainScreen(QMainWindow):
         if "cell description" in module[1]:
             self.cellInfo.setText(module[1]["cell description"])
 
-
-
-
+    def buildExportElement(self, exportFunction, radioGroups):
+        if isinstance(exportFunction, str):
+            label = QLabel(exportFunction)
+            return label
         
+        controlElement = exportFunction.controlElement
+        outputElement = None
+        if controlElement == ControlElement.BUTTON:
+            outputElement = QPushButton(exportFunction.name)
+            outputElement.clicked.connect(exportFunction.functionReference)
+
+        elif controlElement == ControlElement.RADIOBUTTON:
+            outputElement = QRadioButton(exportFunction.name)
+
+            if exportFunction.additionalArguments[0] in radioGroups:
+                radioGroups[exportFunction.additionalArguments[0]].addButton(outputElement)
+            else:
+                newGroup = QButtonGroup()
+                radioGroups[exportFunction.additionalArguments[0]] = newGroup
+                newGroup.addButton(outputElement)
+                outputElement.setChecked(True)
+            outputElement.clicked.connect(exportFunction.functionReference)
+                
+        elif controlElement == ControlElement.CHECKBOX:
+            outputElement = QCheckBox(exportFunction.name)
+            outputElement.clicked.connect(exportFunction.functionReference)
+
+        elif controlElement == ControlElement.SLIDER:
+            outputElement = QWidget()
+            
+            outputLayout = QVBoxLayout()
+            outputElement.setLayout(outputLayout)
+
+            label = QLabel(exportFunction.name)
+            outputLayout.addWidget(label)
+            slider = QSlider(Qt.Orientation.Horizontal)
+            slider.setMinimum(exportFunction.additionalArguments[0])
+            slider.setMaximum(exportFunction.additionalArguments[1])
+            slider.setValue(exportFunction.additionalArguments[2])
+            slider.valueChanged.connect(exportFunction.functionReference)
+            outputLayout.addWidget(slider)
+            
+        elif controlElement == ControlElement.SPINBOX:
+            outputElement = QWidget()
+            
+            outputLayout = QVBoxLayout()
+            outputElement.setLayout(outputLayout)
+
+            label = QLabel(exportFunction.name)
+            outputLayout.addWidget(label)
+            spinbox = QSpinBox()
+            spinbox.setMinimum(exportFunction.additionalArguments[0])
+            spinbox.setMaximum(exportFunction.additionalArguments[1])
+            spinbox.setValue(exportFunction.additionalArguments[2])
+            spinbox.valueChanged.connect(exportFunction.functionReference)
+            outputLayout.addWidget(spinbox)
+
+        return outputElement

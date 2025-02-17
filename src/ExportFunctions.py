@@ -1,10 +1,16 @@
 from enum import Enum
 
 class ControlElement(Enum):
+    # no additional arguments. function does not need input variables
     BUTTON = 1
-    RADIALBUTTON = 2
+    # group name as an additional argument. determined which other buttons turn off once this button gets pressed. function does not need input variables
+    RADIOBUTTON = 2
+    # no additional arguments. function does not need input variables
     CHECKBOX = 3
+    # three additional arguments: bottom value, top value, starting value. all have to be whole numbers. the bottom value has to be lower than the top value
+    # function needs one input variable (it will only receive integers)
     SLIDER = 4
+    # same as slider
     SPINBOX = 5
 
 class ExportFunction():
