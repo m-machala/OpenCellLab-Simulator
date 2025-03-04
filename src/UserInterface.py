@@ -2,13 +2,15 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
-    QButtonGroup, QSlider, QSpinBox
+    QButtonGroup, QSlider, QSpinBox, QSizePolicy
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer, QSize
+from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage
 import ModuleFinder
 import os
 from CellExecutor import CellExecutor
 from ExportFunctions import ExportFunction, ControlElement
+from base_classes.Cell import Cell
 
 class WelcomeScreen(QMainWindow):
     def __init__(self):
@@ -169,8 +171,32 @@ class MainScreen(QMainWindow):
         self.setCentralWidget(centralWidget)
         mainLayout = QHBoxLayout(centralWidget)
 
+        # timer
+
+        self.timer = QTimer()
+        self.timer.setInterval(1)
+        self.timer.timeout.connect(self.updateSimulationView)
+        self.timer.stop()
+
+        # toolbar
+
         toolbar = QToolBar()
         self.addToolBar(toolbar)
+
+        playAction = QAction(QIcon(), "Play", self)
+        toolbar.addAction(playAction)
+        playAction.triggered.connect(self.timer.start)
+
+        pauseAction = QAction(QIcon(), "Pause", self)
+        toolbar.addAction(pauseAction)
+        pauseAction.triggered.connect(self.timer.stop)
+
+        self.stepAction = QAction(QIcon(), "Step", self)
+        toolbar.addAction(self.stepAction)
+        self.stepAction.triggered.connect(self.timer.stop)
+        self.stepAction.triggered.connect(self.updateSimulationView)
+
+        # simulation and cell selection        
 
         simucellLayout = QVBoxLayout()
         mainLayout.addLayout(simucellLayout, 2)
@@ -180,7 +206,9 @@ class MainScreen(QMainWindow):
         simulationLabel = QLabel("Simulation")
         simucellLayout.addWidget(simulationLabel)
 
-        self.simulationImageLabel = QLabel()
+        self.simulationImageLabel = PixelPerfectLabel()
+        self.simulationImageLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.simulationImageLabel.setMinimumSize(1, 1)
         simucellLayout.addWidget(self.simulationImageLabel, 3)
 
         # cells
@@ -256,6 +284,7 @@ class MainScreen(QMainWindow):
         self.reload(rendererData, environmentData, cellPackDataList)
 
     def reload(self, rendererData, environmentData, cellPackDataList):
+        self.exportTimers = []
         # get references to main modules
         rendererReference = ModuleFinder.loadRenderer(rendererData)
         environmentReference = ModuleFinder.loadEnvironment(environmentData)
@@ -269,6 +298,9 @@ class MainScreen(QMainWindow):
         self.environment = environmentReference()
 
         self.executor = CellExecutor(self.environment, [])
+        self.stepAction.triggered.connect(self.executor.cycleCells)
+        self.timer.timeout.connect(self.executor.cycleCells)
+
         self.environment.setExecutor(self.executor)
 
         if self.executor == None:
@@ -295,16 +327,25 @@ class MainScreen(QMainWindow):
         # renderer exports
         self.radioGroupsRenderer = {}
         for exportFunction in self.renderer.exportFunctions:
-            element = self.buildExportElement(exportFunction, self.radioGroupsRenderer)
+            element = self.buildExportElement(exportFunction, True)
             self.rendererExportsInnerLayout.addWidget(element)
         self.rendererExportsInnerLayout.addStretch(1)
 
         # environment exports
         self.radioGroupsEnvironment = {}
         for exportFunction in self.environment.exportFunctions:
-            element = self.buildExportElement(exportFunction, self.radioGroupsEnvironment)
+            element = self.buildExportElement(exportFunction, False)
             self.environmentExportsInnerLayout.addWidget(element)
         self.environmentExportsInnerLayout.addStretch(1)
+
+        # TODO: remove this
+        cell = Cell(self.cellList[1][0](self.environment))
+        cell.cellData["xPosition"] = 0
+        cell.cellData["yPosition"] = 0
+        cell.cellData["color"] = (255, 255, 255)
+        self.executor.addCell(cell)
+
+        self.updateSimulationView()
 
         
     def loadingFailed(self):
@@ -320,7 +361,7 @@ class MainScreen(QMainWindow):
         if "cell description" in module[1]:
             self.cellInfo.setText(module[1]["cell description"])
 
-    def buildExportElement(self, exportFunction, radioGroups):
+    def buildExportElement(self, exportFunction, isRenderer):
         if isinstance(exportFunction, str):
             label = QLabel(exportFunction)
             return label
@@ -331,7 +372,24 @@ class MainScreen(QMainWindow):
             outputElement = QPushButton(exportFunction.name)
             outputElement.clicked.connect(exportFunction.functionReference)
 
+        elif controlElement == ControlElement.REPEATINGBUTTON:
+            outputElement = QPushButton(exportFunction.name)
+
+            timer = QTimer()
+            timer.setInterval(exportFunction.additionalArguments[0])
+            timer.timeout.connect(exportFunction.functionReference)
+            
+            outputElement.pressed.connect(timer.start)
+            outputElement.released.connect(timer.stop)
+
+            self.exportTimers.append(timer)
+
         elif controlElement == ControlElement.RADIOBUTTON:
+            if isRenderer:
+                radioGroups = self.radioGroupsRenderer
+            else:
+                radioGroups = self.radioGroupsEnvironment
+
             outputElement = QRadioButton(exportFunction.name)
 
             if exportFunction.additionalArguments[0] in radioGroups:
@@ -361,6 +419,9 @@ class MainScreen(QMainWindow):
             slider.setValue(exportFunction.additionalArguments[2])
             slider.valueChanged.connect(exportFunction.functionReference)
             outputLayout.addWidget(slider)
+
+            if isRenderer:
+                slider.valueChanged.connect(self.updateSimulationView)
             
         elif controlElement == ControlElement.SPINBOX:
             outputElement = QWidget()
@@ -377,4 +438,37 @@ class MainScreen(QMainWindow):
             spinbox.valueChanged.connect(exportFunction.functionReference)
             outputLayout.addWidget(spinbox)
 
+            if isRenderer:
+                spinbox.valueChanged.connect(self.updateSimulationView)
+
+        if isRenderer and outputElement != None:
+            if not (controlElement == ControlElement.SLIDER or controlElement == ControlElement.SPINBOX):
+                if controlElement == ControlElement.REPEATINGBUTTON:
+                    self.exportTimers[-1].timeout.connect(self.updateSimulationView)
+                else:
+                    outputElement.clicked.connect(self.updateSimulationView) # type: ignore
+
         return outputElement
+    
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.renderer.setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
+        self.updateSimulationView()
+
+    def updateSimulationView(self):
+        self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
+
+
+class PixelPerfectLabel(QLabel):
+    def sizeHint(self):
+        if self.width() > 0:
+            width = self.width()
+        else:
+            width = 100
+
+        if self.height() > 0:
+            height = self.height()
+        else:
+            height = 100
+
+        return QSize(width, height)

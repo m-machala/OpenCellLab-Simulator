@@ -20,8 +20,10 @@ class CellExecutor:
         for livingCell in self.cellList:
             if(cell.cellBrain == livingCell.cellBrain or cell.cellData == livingCell.cellData):
                 return
-        
-        self.cellList.insert(self.cellList.index(self.currentCell), cell)
+        insertionIndex = 0
+        if self.currentCell != None:
+            insertionIndex = self.cellList.index(self.currentCell)
+        self.cellList.insert(insertionIndex, cell)
 
     def removeCell(self, cell):
         self.cellList.remove(cell)

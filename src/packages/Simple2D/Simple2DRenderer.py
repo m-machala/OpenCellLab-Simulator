@@ -1,3 +1,4 @@
+from io import BytesIO
 from PIL import Image
 from base_classes.Renderer import Renderer
 from ExportFunctions import ExportFunction, ControlElement
@@ -10,10 +11,10 @@ class Simple2DRenderer(Renderer):
         self.yCenterPosition = 0
 
         self.exportFunctions = [
-            ExportFunction(self.moveUp, "Move up", ControlElement.BUTTON),
-            ExportFunction(self.moveDown, "Move down", ControlElement.BUTTON),
-            ExportFunction(self.moveLeft, "Move left", ControlElement.BUTTON),
-            ExportFunction(self.moveRight, "Move right", ControlElement.BUTTON)            
+            ExportFunction(self.moveUp, "Move up", ControlElement.REPEATINGBUTTON, [10]),
+            ExportFunction(self.moveDown, "Move down", ControlElement.REPEATINGBUTTON, [10]),
+            ExportFunction(self.moveLeft, "Move left", ControlElement.REPEATINGBUTTON, [10]),
+            ExportFunction(self.moveRight, "Move right", ControlElement.REPEATINGBUTTON, [10])            
         ]
 
     def render(self, simple2DCellList):
@@ -31,8 +32,11 @@ class Simple2DRenderer(Renderer):
         for cell in simple2DCellList:
             if gridLeftBound <= cell.cellData["xPosition"] < gridRightBound and gridTopBound <= cell.cellData["yPosition"] < gridBottomBound:
                 outputImagePixels[cell.cellData["xPosition"] - gridLeftBound, cell.cellData["yPosition"] - gridTopBound] = cell.cellData["color"]
-        
-        return outputImage
+
+        # Convert PIL image to PNG bytes
+        buffer = BytesIO()
+        outputImage.save(buffer, format="PNG")
+        return buffer.getvalue()
 
     def moveUp(self):
         self.yCenterPosition -= 1
@@ -53,3 +57,4 @@ class Simple2DRenderer(Renderer):
     #    self.scale -= 1
     #    if self.scale < 1:
     #        self.scale = 1
+
