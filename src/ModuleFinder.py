@@ -87,7 +87,7 @@ def loadRenderer(rendererJSON):
     foundModule = importlib.util.module_from_spec(moduleSpec)
 
     try:
-        moduleSpec.loader.exec_module(foundModule)
+        moduleSpec.loader.exec_module(foundModule) # type: ignore
         classReference = getattr(foundModule, rendererJSON["package class"])
 
         return classReference
@@ -101,7 +101,7 @@ def loadEnvironment(environmentJSON):
     foundModule = importlib.util.module_from_spec(moduleSpec)
 
     try:
-        moduleSpec.loader.exec_module(foundModule)
+        moduleSpec.loader.exec_module(foundModule) # type: ignore
         classReference = getattr(foundModule, environmentJSON["package class"])
 
         return classReference
@@ -117,7 +117,7 @@ def loadCellPack(cellPackJSON):
     
     foundModule = importlib.util.module_from_spec(moduleSpec) 
     try:
-        moduleSpec.loader.exec_module(foundModule)
+        moduleSpec.loader.exec_module(foundModule) # type: ignore
 
         for cellType in cellPackJSON["cell types"]:
             classReference = getattr(foundModule, cellType["cell class"])

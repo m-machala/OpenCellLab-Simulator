@@ -28,7 +28,9 @@ class Simple2DRenderer(Renderer):
 
         outputImage = Image.new("RGB", (outputBaseWidth, outputBaseHeight))
         outputImagePixels = outputImage.load()
-
+        if outputImagePixels is None:
+            return None
+        
         for cell in simple2DCellList:
             if gridLeftBound <= cell.cellData["xPosition"] < gridRightBound and gridTopBound <= cell.cellData["yPosition"] < gridBottomBound:
                 outputImagePixels[cell.cellData["xPosition"] - gridLeftBound, cell.cellData["yPosition"] - gridTopBound] = cell.cellData["color"]
