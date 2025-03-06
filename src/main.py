@@ -11,6 +11,7 @@ cells = ModuleFinder.filterJSONsByType(modules, "cell")
 
 app = QApplication(sys.argv)
 main_window = MainScreen(renderer, environment, cells)
+
 main_window.setWindowTitle("Open Cell Lab")
 main_window.show()
 sys.exit(app.exec())

@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import (
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
     QButtonGroup, QSlider, QSpinBox, QSizePolicy
 )
-from PyQt6.QtCore import Qt, QTimer, QSize
-from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage
+from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage, QMouseEvent
 import ModuleFinder
 import os
 from CellExecutor import CellExecutor
@@ -209,6 +209,7 @@ class MainScreen(QMainWindow):
         self.simulationImageLabel = PixelPerfectLabel()
         self.simulationImageLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.simulationImageLabel.setMinimumSize(1, 1)
+        self.simulationImageLabel.clicked.connect(self.imageClicked)
         simucellLayout.addWidget(self.simulationImageLabel, 3)
 
         # cells
@@ -458,8 +459,12 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
+    def imageClicked(self, x, y):
+        print("Image clicked at: " + str(x) + " " + str(y))
+
 
 class PixelPerfectLabel(QLabel):
+    clicked = pyqtSignal(int, int)
     def sizeHint(self):
         if self.width() > 0:
             width = self.width()
@@ -472,3 +477,9 @@ class PixelPerfectLabel(QLabel):
             height = 100
 
         return QSize(width, height)
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.MouseButton.LeftButton:
+            x = event.position().x()
+            y = event.position().y()
+            self.clicked.emit(int(x), int(y))
