@@ -18,6 +18,15 @@ class Simple2DEnvironment(Environment):
     def cellsCycled(self):
         pass
 
+    def primaryInteraction(self, data):
+        print("left click")
+    
+    def secondaryInteraction(self, data):
+        print("right click")
+    
+    def tertiaryInteraction(self, data):
+        print("middle click")
+
     def checkForCell(self, relativeXCoordinate, relativeYcoordinate):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:

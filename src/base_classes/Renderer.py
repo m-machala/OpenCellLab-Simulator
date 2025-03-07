@@ -14,15 +14,28 @@ class Renderer(ABC):
         self.setOutputResolution(outputResolutionW, outputResolutionH)
         self.exportFunctions = []
 
-    # The render function should return an image with the output resolution 
+    # The render function should return an image in the output resolution 
     # set in the constructor/setOutputResolution function.
     @abstractmethod
     def render(self, cellDataList):
         pass
+    
+    # This function should transform the coordinates of the rendered image into a form usable by environments
+    # The main purpose of this function is to determine which part of the simulation the user is interacting with
+    # The output of this function can vary based on what's convenient for the renderer and its environments
+    # The output will be handed directly to the active environment's functions for interpreting clicks
+    @abstractmethod
+    def convertFromImageCoordinates(self, xCoordinate, yCoordinate):
+        pass
 
+    # Sets the output resolution. This function is called whenever the simulation window in the UI is resized
+    # W is width, H is height
     def setOutputResolution(self, outputResolutionW, outputResolutionH):
         self.outputResolutionW = outputResolutionW
         self.outputResolutionH = outputResolutionH
 
+    # Returns a list of functions to be exported into the UI
+    # For more info check ExportFunctions.py
     def getExportFunctions(self):
         return self.exportFunctions
+    

@@ -39,6 +39,12 @@ class Simple2DRenderer(Renderer):
         buffer = BytesIO()
         outputImage.save(buffer, format="PNG")
         return buffer.getvalue()
+    
+    def convertFromImageCoordinates(self, xCoordinate, yCoordinate):
+        gridLeftBound = xCoordinate + (self.xCenterPosition + self.outputResolutionW // 2) - self.outputResolutionW
+        gridTopBound = yCoordinate + (self.yCenterPosition + self.outputResolutionH // 2) - self.outputResolutionH
+        print(str(gridLeftBound) + " " + str(gridTopBound))
+        return [gridLeftBound, gridTopBound]
 
     def moveUp(self):
         self.yCenterPosition -= 1

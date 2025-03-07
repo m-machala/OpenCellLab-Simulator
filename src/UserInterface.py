@@ -209,7 +209,9 @@ class MainScreen(QMainWindow):
         self.simulationImageLabel = PixelPerfectLabel()
         self.simulationImageLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.simulationImageLabel.setMinimumSize(1, 1)
-        self.simulationImageLabel.clicked.connect(self.imageClicked)
+        self.simulationImageLabel.leftClicked.connect(self.imageLeftClicked)
+        self.simulationImageLabel.rightClicked.connect(self.imageRightClicked)
+        self.simulationImageLabel.middleClicked.connect(self.imageMiddleClicked)
         simucellLayout.addWidget(self.simulationImageLabel, 3)
 
         # cells
@@ -459,12 +461,20 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
-    def imageClicked(self, x, y):
-        print("Image clicked at: " + str(x) + " " + str(y))
+    def imageLeftClicked(self, x, y):
+        self.environment.primaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+
+    def imageRightClicked(self, x, y):
+        self.environment.secondaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+
+    def imageMiddleClicked(self, x, y):
+        self.environment.tertiaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
 
 
 class PixelPerfectLabel(QLabel):
-    clicked = pyqtSignal(int, int)
+    leftClicked = pyqtSignal(int, int)
+    rightClicked = pyqtSignal(int, int)
+    middleClicked = pyqtSignal(int, int)
     def sizeHint(self):
         if self.width() > 0:
             width = self.width()
@@ -482,4 +492,14 @@ class PixelPerfectLabel(QLabel):
         if event.button() == Qt.MouseButton.LeftButton:
             x = event.position().x()
             y = event.position().y()
-            self.clicked.emit(int(x), int(y))
+            self.leftClicked.emit(int(x), int(y))
+
+        if event.button() == Qt.MouseButton.RightButton:
+            x = event.position().x()
+            y = event.position().y()
+            self.rightClicked.emit(int(x), int(y))
+
+        if event.button() == Qt.MouseButton.MiddleButton:
+            x = event.position().x()
+            y = event.position().y()
+            self.middleClicked.emit(int(x), int(y))
