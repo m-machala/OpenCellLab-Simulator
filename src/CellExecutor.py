@@ -5,6 +5,11 @@ class CellExecutor:
         self.cellList = initialCellList
         self.currentCell = None
         self._environment = environment
+        # Cell brain reference selected by the user in the UI
+        self.selectedCellBrainReference = None
+
+    def selectCellBrainReference(self, cellBrain):
+        self.selectedCellBrainReference = cellBrain
 
     def cycleCells(self):
         cellListCopy = self.cellList.copy()
