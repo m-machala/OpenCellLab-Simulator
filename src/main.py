@@ -1,5 +1,6 @@
 from UserInterface import WelcomeScreen, MainScreen
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QResizeEvent
 import sys
 import ModuleFinder
 
@@ -14,4 +15,5 @@ main_window = MainScreen(renderer, environment, cells)
 
 main_window.setWindowTitle("Open Cell Lab")
 main_window.show()
+main_window.resizeEvent(QResizeEvent(main_window.size(), main_window.size()))
 sys.exit(app.exec())

@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QButtonGroup, QSlider, QSpinBox, QSizePolicy
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage, QMouseEvent
+from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage, QMouseEvent, QResizeEvent
 import ModuleFinder
 import os
 from CellExecutor import CellExecutor
@@ -175,7 +175,7 @@ class MainScreen(QMainWindow):
         # timer
 
         self.timer = QTimer()
-        self.timer.setInterval(1)
+        self.timer.setInterval(250)
         self.timer.timeout.connect(self.updateSimulationView)
         self.timer.stop()
 
@@ -284,7 +284,6 @@ class MainScreen(QMainWindow):
 
         self.radioGroupsRenderer = {}
         self.radioGroupsEnvironment = {}
-
         self.reload(rendererData, environmentData, cellPackDataList)
 
     def reload(self, rendererData, environmentData, cellPackDataList):
@@ -341,16 +340,6 @@ class MainScreen(QMainWindow):
             element = self.buildExportElement(exportFunction, False)
             self.environmentExportsInnerLayout.addWidget(element)
         self.environmentExportsInnerLayout.addStretch(1)
-
-        # TODO: remove this
-        cell = Cell(self.cellList[1][0](self.environment))
-        cell.cellData["xPosition"] = 0
-        cell.cellData["yPosition"] = 0
-        cell.cellData["color"] = (255, 255, 255)
-        self.executor.addCell(cell)
-
-        self.updateSimulationView()
-
         
     def loadingFailed(self):
         print("Loading error")
@@ -469,12 +458,15 @@ class MainScreen(QMainWindow):
 
     def imageLeftClicked(self, x, y):
         self.environment.primaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        self.updateSimulationView()
 
     def imageRightClicked(self, x, y):
         self.environment.secondaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        self.updateSimulationView()
 
     def imageMiddleClicked(self, x, y):
         self.environment.tertiaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        self.updateSimulationView()
 
 
 class PixelPerfectLabel(QLabel):
