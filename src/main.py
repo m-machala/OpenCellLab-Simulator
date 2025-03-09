@@ -1,19 +1,10 @@
-from UserInterface import WelcomeScreen, MainScreen
+from UserInterface import WelcomeScreen
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QResizeEvent
 import sys
-import ModuleFinder
-
-modules = ModuleFinder.findPackageJSONs(".\\packages")
-renderer = ModuleFinder.filterJSONsByType(modules, "renderer")[0]
-environment = ModuleFinder.filterJSONsByType(modules, "environment")[0]
-cells = ModuleFinder.filterJSONsByType(modules, "cell")
-
 
 app = QApplication(sys.argv)
-main_window = MainScreen(renderer, environment, cells)
+main_window = WelcomeScreen()
 
 main_window.setWindowTitle("Open Cell Lab")
 main_window.show()
-main_window.resizeEvent(QResizeEvent(main_window.size(), main_window.size()))
 sys.exit(app.exec())

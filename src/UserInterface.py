@@ -20,6 +20,10 @@ class WelcomeScreen(QMainWindow):
         self.setCentralWidget(centralWidget)
         mainLayout = QVBoxLayout(centralWidget)
 
+        self.selectedEnvironment = None
+        self.selectedRenderer = None
+        self.selectedCells = None
+
         # introduction
         welcomeLabel = QLabel("Welcome to OCL!")
         mainLayout.addWidget(welcomeLabel)
@@ -109,9 +113,19 @@ class WelcomeScreen(QMainWindow):
             self.setModuleInfoText("")
 
         if module["package type"] == "environment":
+            self.selectedEnvironment = module
+            for packIndex in range(moduleIndex, -1, -1):
+                if self.moduleListItems[packIndex]["package type"] == "renderer":
+                    self.selectedRenderer = self.moduleListItems[packIndex]
+                    break
+
             self.beginButton.setEnabled(True)
             self.populateCellPackList(module)
         else:
+            self.selectedEnvironment = None
+            self.selectedRenderer = None
+            self.selectedCells = None
+
             self.beginButton.setDisabled(True)
             self.cellList.clear()
 
@@ -124,6 +138,7 @@ class WelcomeScreen(QMainWindow):
         
         modules = ModuleFinder.findPackageJSONs(os.path.dirname(os.path.abspath(__file__)) + "\\packages")
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
+        self.selectedCells = cellPacks
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
@@ -160,7 +175,9 @@ class WelcomeScreen(QMainWindow):
         self.cellList.clearSelection()
 
     def beginClicked(self):
-        pass
+        mainScreen = MainScreen(self.selectedRenderer, self.selectedEnvironment, self.selectedCells)
+        self.setCentralWidget(mainScreen)
+        self.resize(1000, 750)
 
     def exitClicked(self):
         self.close()  
@@ -466,6 +483,11 @@ class MainScreen(QMainWindow):
 
     def imageMiddleClicked(self, x, y):
         self.environment.tertiaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        self.updateSimulationView()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.renderer.setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.updateSimulationView()
 
 
