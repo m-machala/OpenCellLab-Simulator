@@ -55,7 +55,7 @@ class Simple2DEnvironment(Environment):
     def checkForCell(self, relativeXCoordinate, relativeYcoordinate):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
-            return
+            return True
         
         currentCellX = currentCell.cellData["xPosition"]
         currentCellY = currentCell.cellData["yPosition"]

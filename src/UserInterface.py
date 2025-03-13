@@ -193,7 +193,7 @@ class MainScreen(QMainWindow):
 
         self.timer = QTimer()
         self.timer.setInterval(250)
-        self.timer.timeout.connect(self.updateSimulationView)
+        self.timer.timeout.connect(self.timerTriggered)
         self.timer.stop()
 
         # toolbar
@@ -208,11 +208,12 @@ class MainScreen(QMainWindow):
         pauseAction = QAction(QIcon(), "Pause", self)
         toolbar.addAction(pauseAction)
         pauseAction.triggered.connect(self.timer.stop)
+        pauseAction.triggered.connect(self.updateSimulationView)
 
         self.stepAction = QAction(QIcon(), "Step", self)
         toolbar.addAction(self.stepAction)
         self.stepAction.triggered.connect(self.timer.stop)
-        self.stepAction.triggered.connect(self.updateSimulationView)
+        self.stepAction.triggered.connect(self.stepClicked)
 
         # simulation and cell selection        
 
@@ -318,8 +319,6 @@ class MainScreen(QMainWindow):
         self.environment = environmentReference()
 
         self.executor = CellExecutor(self.environment, [])
-        self.stepAction.triggered.connect(self.executor.cycleCells)
-        self.timer.timeout.connect(self.executor.cycleCells)
 
         self.environment.setExecutor(self.executor)
 
@@ -465,6 +464,13 @@ class MainScreen(QMainWindow):
 
         return outputElement
     
+    def timerTriggered(self):
+        self.executor.cycleCells()
+        self.updateSimulationView()
+
+    def stepClicked(self):
+        self.timerTriggered()
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.renderer.setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
