@@ -26,10 +26,10 @@ class Simple2DRenderer(Renderer):
         outputBaseWidth = self.outputResolutionW
         outputBaseHeight = self.outputResolutionH
 
-        gridTopBound = self.yCenterPosition - outputBaseHeight // (2 * self.scale)
-        gridBottomBound = math.ceil(self.yCenterPosition + outputBaseHeight / (2 * self.scale))
-        gridLeftBound = self.xCenterPosition - outputBaseWidth // (2 * self.scale)
-        gridRightBound = math.ceil(self.xCenterPosition + outputBaseWidth / (2 * self.scale))
+        gridTopBound = self.yCenterPosition - outputBaseHeight / (2 * self.scale)
+        gridBottomBound = self.yCenterPosition + outputBaseHeight / (2 * self.scale)
+        gridLeftBound = self.xCenterPosition - outputBaseWidth / (2 * self.scale)
+        gridRightBound = self.xCenterPosition + outputBaseWidth / (2 * self.scale)
 
         outputImage = Image.new("RGB", (outputBaseWidth, outputBaseHeight))
         outputImagePixels = outputImage.load()
@@ -37,11 +37,11 @@ class Simple2DRenderer(Renderer):
             return None
         
         for cell in simple2DCellList:
-            if gridLeftBound - 1 <= cell.cellData["xPosition"] <= gridRightBound and gridTopBound - 1 <= cell.cellData["yPosition"] <= gridBottomBound:
+            if gridLeftBound - self.scale <= cell.cellData["xPosition"] <= gridRightBound + self.scale and gridTopBound - self.scale <= cell.cellData["yPosition"] <= gridBottomBound + self.scale:
                 for scaleX in range(self.scale):
                     for scaleY in range(self.scale):
-                        xPosition = ((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + scaleX
-                        yPosition = ((cell.cellData["yPosition"] - gridTopBound) * self.scale) + scaleY
+                        xPosition = math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + scaleX)
+                        yPosition = math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + scaleY)
 
                         if 0 <= xPosition < self.outputResolutionW and 0 <= yPosition < self.outputResolutionH:
                             outputImagePixels[xPosition, yPosition] = cell.cellData["color"]
@@ -52,8 +52,8 @@ class Simple2DRenderer(Renderer):
         return buffer.getvalue()
     
     def convertFromImageCoordinates(self, xCoordinate, yCoordinate):
-        xConverted = (xCoordinate // self.scale) + (math.floor(self.xCenterPosition) - self.outputResolutionW // (2 * self.scale))
-        yConverted = (yCoordinate // self.scale) + (math.floor(self.yCenterPosition) - self.outputResolutionH // (2 * self.scale))
+        xConverted = math.floor((xCoordinate / self.scale) + (self.xCenterPosition - self.outputResolutionW / (2 * self.scale)))
+        yConverted = math.floor((yCoordinate / self.scale) + (self.yCenterPosition - self.outputResolutionH / (2 * self.scale)))
         return [xConverted, yConverted]
 
     def moveUp(self):
