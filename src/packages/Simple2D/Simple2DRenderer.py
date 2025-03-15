@@ -1,5 +1,5 @@
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageDraw
 from base_classes.Renderer import Renderer
 from ExportFunctions import ExportFunction, ControlElement
 import math
@@ -32,19 +32,22 @@ class Simple2DRenderer(Renderer):
         gridRightBound = self.xCenterPosition + outputBaseWidth / (2 * self.scale)
 
         outputImage = Image.new("RGB", (outputBaseWidth, outputBaseHeight))
-        outputImagePixels = outputImage.load()
-        if outputImagePixels is None:
+        outputImageDraw = ImageDraw.Draw(outputImage)
+        if outputImageDraw is None:
             return None
         
         for cell in simple2DCellList:
             if gridLeftBound - self.scale <= cell.cellData["xPosition"] <= gridRightBound + self.scale and gridTopBound - self.scale <= cell.cellData["yPosition"] <= gridBottomBound + self.scale:
-                for scaleX in range(self.scale):
-                    for scaleY in range(self.scale):
-                        xPosition = math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + scaleX)
-                        yPosition = math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + scaleY)
+                topLeftX = min(self.outputResolutionW - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale))))
+                topLeftY = min(self.outputResolutionH - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale))))
 
-                        if 0 <= xPosition < self.outputResolutionW and 0 <= yPosition < self.outputResolutionH:
-                            outputImagePixels[xPosition, yPosition] = cell.cellData["color"]
+                bottomRightX = min(self.outputResolutionW - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + self.scale)))
+                bottomRightY = min(self.outputResolutionH - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + self.scale)))
+
+                if topLeftX >= bottomRightX or topLeftY >= bottomRightY:
+                    continue
+
+                outputImageDraw.rectangle([(topLeftX, topLeftY), (bottomRightX, bottomRightY)], fill = cell.cellData["color"], outline = cell.cellData["color"])
 
         # Convert PIL image to PNG bytes
         buffer = BytesIO()
@@ -69,10 +72,10 @@ class Simple2DRenderer(Renderer):
         self.xCenterPosition += self.moveSpeed / self.scale
 
     def zoomIn(self):
-        self.scale += 1
+        self.scale *= 2
     
     def zoomOut(self):
-        self.scale -= 1
+        self.scale //= 2
         if self.scale < 1:
             self.scale = 1
 
