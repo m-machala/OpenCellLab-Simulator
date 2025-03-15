@@ -1,7 +1,7 @@
 {
     "package type": "cell",
 	"package name": "RandomWalk",
-	"author name": "AUTHOR",
+	"author name": "m_machala",
 	"package description": "This pack contains a cell which does a random walk.",
 	"package image path": "PATH",
 	"package path": "RandomWalk.py",

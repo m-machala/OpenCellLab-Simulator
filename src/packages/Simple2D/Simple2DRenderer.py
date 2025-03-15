@@ -38,16 +38,16 @@ class Simple2DRenderer(Renderer):
         
         for cell in simple2DCellList:
             if gridLeftBound - self.scale <= cell.cellData["xPosition"] <= gridRightBound + self.scale and gridTopBound - self.scale <= cell.cellData["yPosition"] <= gridBottomBound + self.scale:
-                topLeftX = min(self.outputResolutionW - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale))))
-                topLeftY = min(self.outputResolutionH - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale))))
+                topLeftX = min(outputBaseWidth - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale))))
+                topLeftY = min(outputBaseHeight - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale))))
 
-                bottomRightX = min(self.outputResolutionW - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + self.scale)))
-                bottomRightY = min(self.outputResolutionH - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + self.scale)))
+                bottomRightX = min(outputBaseWidth - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + self.scale - 1)))
+                bottomRightY = min(outputBaseHeight - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + self.scale - 1)))
 
                 if topLeftX >= bottomRightX or topLeftY >= bottomRightY:
                     continue
 
-                outputImageDraw.rectangle([(topLeftX, topLeftY), (bottomRightX, bottomRightY)], fill = cell.cellData["color"], outline = cell.cellData["color"])
+                outputImageDraw.rectangle([(topLeftX, topLeftY), (bottomRightX, bottomRightY)], fill = cell.cellData["color"])
 
         # Convert PIL image to PNG bytes
         buffer = BytesIO()

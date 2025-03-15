@@ -31,7 +31,10 @@ class CellExecutor:
         self.cellList.insert(insertionIndex, cell)
 
     def removeCell(self, cell):
+        if self.currentCell == cell:
+            self.currentCell = None
         self.cellList.remove(cell)
         
     def clearCells(self):
+        self.currentCell = None
         self.cellList.clear()
