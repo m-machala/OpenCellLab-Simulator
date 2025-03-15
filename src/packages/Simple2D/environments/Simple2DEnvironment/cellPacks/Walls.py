@@ -1,5 +1,4 @@
 from base_classes.CellBrain import CellBrain
-import random
 
 class WhiteWall(CellBrain):
     COLOR = (255, 255, 255)
