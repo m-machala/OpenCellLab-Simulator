@@ -39,9 +39,8 @@ class Renderer(ABC):
     def getExportFunctions(self):
         return self.exportFunctions
     
-        # Used for handling the user left-clicking the simulation
-    # The data variable contains data about the interactions in an arbitrary form set by the renderer
-    # Please check your renderer's documentation to see what data is being passed
+    # Used for handling the user left-clicking the simulation
+    # The data variable contains a tuple of the x and y coordinates
     def primaryClick(self, data):
         pass
     
@@ -51,8 +50,7 @@ class Renderer(ABC):
         pass
 
     # Used for handling the user right-clicking the simulation
-    # The data variable contains data about the interactions in an arbitrary form set by the renderer
-    # Please check your renderer's documentation to see what data is being passed
+    # The data variable contains a tuple of the x and y coordinates
     def secondaryClick(self, data):
         pass
 
@@ -62,8 +60,7 @@ class Renderer(ABC):
         pass
 
     # Used for handling the user middle-clicking the simulation
-    # The data variable contains data about the interactions in an arbitrary form set by the renderer
-    # Please check your renderer's documentation to see what data is being passed
+    # The data variable contains a tuple of the x and y coordinates
     def tertiaryClick(self, data):
         pass
 
