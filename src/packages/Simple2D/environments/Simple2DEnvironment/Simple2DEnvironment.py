@@ -9,7 +9,13 @@ class Simple2DEnvironment(Environment):
     def cellsCycled(self):
         pass
 
-    def primaryInteraction(self, data):
+    def primaryClick(self, data):
+        self.addUserCell(data)
+
+    def primaryDrag(self, originalData, newData):
+        self.addUserCell(newData)
+
+    def addUserCell(self, data):
         xCoordinate = data[0]
         yCoordinate = data[1]
         cellBrainReference = self._cellExecutor.selectedCellBrainReference
@@ -28,10 +34,16 @@ class Simple2DEnvironment(Environment):
             newCell.cellData["color"] = type(newCellBrain).COLOR
         else:
             newCell.cellData["color"] = (255, 255, 255)
-
+        
         self._cellExecutor.addCell(newCell)
     
-    def secondaryInteraction(self, data):
+    def secondaryClick(self, data):
+        self.userRemoveCell(data)
+
+    def secondaryDrag(self, originalData, newData):
+        self.userRemoveCell(newData)        
+            
+    def userRemoveCell(self, data):
         xCoordinate = data[0]
         yCoordinate = data[1]
 
@@ -40,8 +52,6 @@ class Simple2DEnvironment(Environment):
                 self._cellExecutor.removeCell(cell)
                 return
     
-    def tertiaryInteraction(self, data):
-        print("middle click")
 
     def checkForCell(self, relativeXCoordinate, relativeYcoordinate):
         currentCell = self._cellExecutor.currentCell

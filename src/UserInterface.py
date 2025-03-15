@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QButtonGroup, QSlider, QSpinBox, QSizePolicy
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon, QPixmap, QImage, QMouseEvent, QResizeEvent
+from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent
 import ModuleFinder
 import os
 from CellExecutor import CellExecutor
@@ -189,12 +189,12 @@ class MainScreen(QMainWindow):
         self.setCentralWidget(centralWidget)
         mainLayout = QHBoxLayout(centralWidget)
 
-        # timer
+        # timers
 
-        self.timer = QTimer()
-        self.timer.setInterval(250)
-        self.timer.timeout.connect(self.timerTriggered)
-        self.timer.stop()
+        self.simulationTimer = QTimer()
+        self.simulationTimer.setInterval(250)
+        self.simulationTimer.timeout.connect(self.simulationTimerTriggered)
+        self.simulationTimer.stop()
 
         # toolbar
 
@@ -203,11 +203,11 @@ class MainScreen(QMainWindow):
 
         playAction = QAction(QIcon(), "Play", self)
         toolbar.addAction(playAction)
-        playAction.triggered.connect(self.timer.start)
+        playAction.triggered.connect(self.simulationTimer.start)
 
         pauseAction = QAction(QIcon(), "Pause", self)
         toolbar.addAction(pauseAction)
-        pauseAction.triggered.connect(self.timer.stop)
+        pauseAction.triggered.connect(self.simulationTimer.stop)
         pauseAction.triggered.connect(self.updateSimulationView)
 
         self.stepAction = QAction(QIcon(), "Step", self)
@@ -217,6 +217,21 @@ class MainScreen(QMainWindow):
         self.clearAction = QAction(QIcon(), "Clear", self)
         toolbar.addAction(self.clearAction)
         self.clearAction.triggered.connect(self.clearClicked)
+
+        mouseModeGroup = QActionGroup(self)
+        mouseModeGroup.setExclusive(True)
+
+        self.clickModeAction = QAction(QIcon(), "Click", self)
+        self.clickModeAction.setCheckable(True)
+        self.clickModeAction.setChecked(True)
+        mouseModeGroup.addAction(self.clickModeAction)
+        toolbar.addAction(self.clickModeAction)
+
+        self.dragModeAction = QAction(QIcon(), "Drag", self)
+        self.dragModeAction.setCheckable(True)
+        mouseModeGroup.addAction(self.dragModeAction)
+        toolbar.addAction(self.dragModeAction)
+
 
         # simulation and cell selection        
 
@@ -228,12 +243,15 @@ class MainScreen(QMainWindow):
         simulationLabel = QLabel("Simulation")
         simucellLayout.addWidget(simulationLabel)
 
-        self.simulationImageLabel = PixelPerfectLabel()
+        self.simulationImageLabel = SimulationLabel()
         self.simulationImageLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.simulationImageLabel.setMinimumSize(1, 1)
         self.simulationImageLabel.leftClicked.connect(self.imageLeftClicked)
         self.simulationImageLabel.rightClicked.connect(self.imageRightClicked)
         self.simulationImageLabel.middleClicked.connect(self.imageMiddleClicked)
+        self.simulationImageLabel.leftDragged.connect(self.imageLeftDragged)
+        self.simulationImageLabel.rightDragged.connect(self.imageRightDragged)
+        self.simulationImageLabel.middleDragged.connect(self.imageMiddleDragged)
         simucellLayout.addWidget(self.simulationImageLabel, 3)
 
         # cells
@@ -467,16 +485,16 @@ class MainScreen(QMainWindow):
 
         return outputElement
     
-    def timerTriggered(self):
+    def simulationTimerTriggered(self):
         self.executor.cycleCells()
         self.updateSimulationView()
 
     def stepClicked(self):
-        self.timer.stop()
-        self.timerTriggered()
+        self.simulationTimer.stop()
+        self.simulationTimerTriggered()
 
     def clearClicked(self):
-        self.timer.stop()
+        self.simulationTimer.stop()
         self.executor.clearCells()
         self.updateSimulationView()
 
@@ -488,17 +506,44 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
+
     def imageLeftClicked(self, x, y):
-        self.environment.primaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        converted = self.renderer.convertFromImageCoordinates(x, y)
+        self.originalLeft = converted
+        if self.clickModeAction.isChecked():
+            self.environment.primaryClick(converted)
         self.updateSimulationView()
 
     def imageRightClicked(self, x, y):
-        self.environment.secondaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        converted = self.renderer.convertFromImageCoordinates(x, y)
+        self.originalRight = converted
+        if self.clickModeAction.isChecked():
+            self.environment.secondaryClick(converted)
         self.updateSimulationView()
 
     def imageMiddleClicked(self, x, y):
-        self.environment.tertiaryInteraction(self.renderer.convertFromImageCoordinates(x, y))
+        converted = self.renderer.convertFromImageCoordinates(x, y)
+        self.originalMiddle = converted
+        if self.clickModeAction.isChecked():
+            self.environment.tertiaryClick(converted)
         self.updateSimulationView()
+
+
+    def imageLeftDragged(self, x, y):
+        if self.dragModeAction.isChecked():
+            self.environment.primaryDrag(self.originalLeft, self.renderer.convertFromImageCoordinates(x, y))
+            self.updateSimulationView()
+
+    def imageRightDragged(self, x, y):
+        if self.dragModeAction.isChecked():
+            self.environment.secondaryDrag(self.originalRight, self.renderer.convertFromImageCoordinates(x, y))
+            self.updateSimulationView()
+
+    def imageMiddleDragged(self, x, y):
+        if self.dragModeAction.isChecked():
+            self.environment.tertiaryDrag(self.originalMiddle, self.renderer.convertFromImageCoordinates(x, y))
+            self.updateSimulationView()
+        
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -506,10 +551,22 @@ class MainScreen(QMainWindow):
         self.updateSimulationView()
 
 
-class PixelPerfectLabel(QLabel):
+class SimulationLabel(QLabel):
     leftClicked = pyqtSignal(int, int)
     rightClicked = pyqtSignal(int, int)
     middleClicked = pyqtSignal(int, int)
+
+    leftDragged = pyqtSignal(int, int)
+    rightDragged = pyqtSignal(int, int)
+    middleDragged = pyqtSignal(int, int)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.leftDragging = False
+        self.rightDragging = False
+        self.middleDragging = False
+
     def sizeHint(self):
         if self.width() > 0:
             width = self.width()
@@ -524,17 +581,40 @@ class PixelPerfectLabel(QLabel):
         return QSize(width, height)
 
     def mousePressEvent(self, event: QMouseEvent):
+        x = int(event.position().x())
+        y = int(event.position().y())
         if event.button() == Qt.MouseButton.LeftButton:
-            x = event.position().x()
-            y = event.position().y()
-            self.leftClicked.emit(int(x), int(y))
+            self.leftDragging = True
+            self.leftClicked.emit(x, y)
 
         if event.button() == Qt.MouseButton.RightButton:
-            x = event.position().x()
-            y = event.position().y()
-            self.rightClicked.emit(int(x), int(y))
+            self.rightDragging = True
+            self.rightClicked.emit(x, y)
 
         if event.button() == Qt.MouseButton.MiddleButton:
-            x = event.position().x()
-            y = event.position().y()
-            self.middleClicked.emit(int(x), int(y))
+            self.middleDragging = True
+            self.middleClicked.emit(x, y)
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        x = int(event.position().x())
+        y = int(event.position().y())
+        if self.leftDragging:
+            self.leftDragged.emit(x, y)
+
+        if self.rightDragging:
+            self.rightDragged.emit(x, y)
+
+        if self.middleDragging:
+            self.middleDragged.emit(x, y)
+
+    def mouseReleaseEvent(self, event:QMouseEvent):
+        if self.leftDragging and event.button() == Qt.MouseButton.LeftButton:
+            self.leftDragging = False
+
+        if self.rightDragged and event.button() == Qt.MouseButton.RightButton:
+            self.rightDragging = False
+
+        if self.middleDragging and event.button() == Qt.MouseButton.MiddleButton:
+            self.middleDragging = False
+
+
