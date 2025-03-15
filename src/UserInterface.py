@@ -218,6 +218,8 @@ class MainScreen(QMainWindow):
         toolbar.addAction(self.clearAction)
         self.clearAction.triggered.connect(self.clearClicked)
 
+        toolbar.addSeparator()
+
         mouseModeGroup = QActionGroup(self)
         mouseModeGroup.setExclusive(True)
 
@@ -231,6 +233,8 @@ class MainScreen(QMainWindow):
         self.dragModeAction.setCheckable(True)
         mouseModeGroup.addAction(self.dragModeAction)
         toolbar.addAction(self.dragModeAction)
+
+        toolbar.addSeparator()
 
 
         # simulation and cell selection        
@@ -586,14 +590,17 @@ class SimulationLabel(QLabel):
         if event.button() == Qt.MouseButton.LeftButton:
             self.leftDragging = True
             self.leftClicked.emit(x, y)
+            self.leftDragged.emit(x, y)
 
         if event.button() == Qt.MouseButton.RightButton:
             self.rightDragging = True
             self.rightClicked.emit(x, y)
+            self.rightDragged.emit(x, y)
 
         if event.button() == Qt.MouseButton.MiddleButton:
             self.middleDragging = True
             self.middleClicked.emit(x, y)
+            self.middleDragged.emit(x, y)
 
     def mouseMoveEvent(self, event: QMouseEvent):
         x = int(event.position().x())
