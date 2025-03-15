@@ -44,7 +44,10 @@ class Simple2DRenderer(Renderer):
                 bottomRightX = min(outputBaseWidth - 1, max(0, math.floor(((cell.cellData["xPosition"] - gridLeftBound) * self.scale) + self.scale - 1)))
                 bottomRightY = min(outputBaseHeight - 1, max(0, math.floor(((cell.cellData["yPosition"] - gridTopBound) * self.scale) + self.scale - 1)))
 
-                if topLeftX >= bottomRightX or topLeftY >= bottomRightY:
+                if (topLeftX == bottomRightX or topLeftY == bottomRightY) and self.scale != 1:
+                    continue
+
+                if topLeftX > bottomRightX or topLeftY > bottomRightY:
                     continue
 
                 outputImageDraw.rectangle([(topLeftX, topLeftY), (bottomRightX, bottomRightY)], fill = cell.cellData["color"])
@@ -81,4 +84,8 @@ class Simple2DRenderer(Renderer):
 
     def setMoveSpeed(self, speed):
         self.moveSpeed = speed
+
+    def primaryDrag(self, originalData, newData):
+        self.xCenterPosition += (originalData[0] - newData[0]) / self.scale
+        self.yCenterPosition += (originalData[1] - newData[1]) / self.scale
 

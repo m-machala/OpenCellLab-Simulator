@@ -236,6 +236,20 @@ class MainScreen(QMainWindow):
 
         toolbar.addSeparator()
 
+        interactionModeGroup = QActionGroup(self)
+        interactionModeGroup.setExclusive(True)
+
+        self.environmentModeAction = QAction(QIcon(), "Environment", self)
+        self.environmentModeAction.setCheckable(True)
+        self.environmentModeAction.setChecked(True)
+        interactionModeGroup.addAction(self.environmentModeAction)
+        toolbar.addAction(self.environmentModeAction)
+
+        self.rendererModeAction = QAction(QIcon(), "Renderer", self)
+        self.rendererModeAction.setCheckable(True)
+        interactionModeGroup.addAction(self.rendererModeAction)
+        toolbar.addAction(self.rendererModeAction)
+
 
         # simulation and cell selection        
 
@@ -510,43 +524,86 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
+    def determineReceiver(self):
+        if self.environmentModeAction.isChecked():
+            return self.environment
+        elif self.rendererModeAction.isChecked():
+            return self.renderer
+        else:
+            return None
+        
+    def processCoordinates(self, x, y):
+        if self.environmentModeAction.isChecked():
+            return self.renderer.convertFromImageCoordinates(x, y)
+        elif self.rendererModeAction.isChecked():
+            return (x, y)
 
     def imageLeftClicked(self, x, y):
-        converted = self.renderer.convertFromImageCoordinates(x, y)
-        self.originalLeft = converted
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        self.originalLeft = processedCoordinates
         if self.clickModeAction.isChecked():
-            self.environment.primaryClick(converted)
+            receiver.primaryClick(processedCoordinates)
         self.updateSimulationView()
 
     def imageRightClicked(self, x, y):
-        converted = self.renderer.convertFromImageCoordinates(x, y)
-        self.originalRight = converted
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        self.originalRight = processedCoordinates
         if self.clickModeAction.isChecked():
-            self.environment.secondaryClick(converted)
+            receiver.secondaryClick(processedCoordinates)
         self.updateSimulationView()
 
     def imageMiddleClicked(self, x, y):
-        converted = self.renderer.convertFromImageCoordinates(x, y)
-        self.originalMiddle = converted
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        self.originalMiddle = processedCoordinates
         if self.clickModeAction.isChecked():
-            self.environment.tertiaryClick(converted)
+            receiver.tertiaryClick(processedCoordinates)
         self.updateSimulationView()
 
 
     def imageLeftDragged(self, x, y):
-        if self.dragModeAction.isChecked():
-            self.environment.primaryDrag(self.originalLeft, self.renderer.convertFromImageCoordinates(x, y))
-            self.updateSimulationView()
+        if not self.dragModeAction.isChecked(): return
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        receiver.primaryDrag(self.originalLeft, processedCoordinates)
+        self.originalLeft = processedCoordinates
+        self.updateSimulationView()
 
     def imageRightDragged(self, x, y):
-        if self.dragModeAction.isChecked():
-            self.environment.secondaryDrag(self.originalRight, self.renderer.convertFromImageCoordinates(x, y))
-            self.updateSimulationView()
+        if not self.dragModeAction.isChecked(): return
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        receiver.secondaryDrag(self.originalRight, processedCoordinates)
+        self.originalRight = processedCoordinates
+        self.updateSimulationView()
 
     def imageMiddleDragged(self, x, y):
-        if self.dragModeAction.isChecked():
-            self.environment.tertiaryDrag(self.originalMiddle, self.renderer.convertFromImageCoordinates(x, y))
-            self.updateSimulationView()
+        if not self.dragModeAction.isChecked(): return
+        receiver = self.determineReceiver()
+        processedCoordinates = self.processCoordinates(x, y)
+        if not receiver or not processedCoordinates:
+            return
+        
+        receiver.tertiaryDrag(self.originalMiddle, processedCoordinates)
+        self.originalMiddle = processedCoordinates
+        self.updateSimulationView()
         
 
     def showEvent(self, event):

@@ -39,3 +39,36 @@ class Renderer(ABC):
     def getExportFunctions(self):
         return self.exportFunctions
     
+        # Used for handling the user left-clicking the simulation
+    # The data variable contains data about the interactions in an arbitrary form set by the renderer
+    # Please check your renderer's documentation to see what data is being passed
+    def primaryClick(self, data):
+        pass
+    
+    # Same as above but for a click and drag
+    # originalData represents the interaction data from the initial press, newData represents the current data
+    def primaryDrag(self, originalData, newData):
+        pass
+
+    # Used for handling the user right-clicking the simulation
+    # The data variable contains data about the interactions in an arbitrary form set by the renderer
+    # Please check your renderer's documentation to see what data is being passed
+    def secondaryClick(self, data):
+        pass
+
+    # Same as above but for a click and drag
+    # originalData represents the interaction data from the initial press, newData represents the current data
+    def secondaryDrag(self, originalData, newData):
+        pass
+
+    # Used for handling the user middle-clicking the simulation
+    # The data variable contains data about the interactions in an arbitrary form set by the renderer
+    # Please check your renderer's documentation to see what data is being passed
+    def tertiaryClick(self, data):
+        pass
+
+    # Same as above but for a click and drag
+    # originalData represents the interaction data from the initial press, newData represents the current data
+    def tertiaryDrag(self, originalData, newData):
+        pass
+    
