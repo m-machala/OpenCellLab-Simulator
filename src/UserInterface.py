@@ -212,8 +212,11 @@ class MainScreen(QMainWindow):
 
         self.stepAction = QAction(QIcon(), "Step", self)
         toolbar.addAction(self.stepAction)
-        self.stepAction.triggered.connect(self.timer.stop)
         self.stepAction.triggered.connect(self.stepClicked)
+
+        self.clearAction = QAction(QIcon(), "Clear", self)
+        toolbar.addAction(self.clearAction)
+        self.clearAction.triggered.connect(self.clearClicked)
 
         # simulation and cell selection        
 
@@ -469,7 +472,13 @@ class MainScreen(QMainWindow):
         self.updateSimulationView()
 
     def stepClicked(self):
+        self.timer.stop()
         self.timerTriggered()
+
+    def clearClicked(self):
+        self.timer.stop()
+        self.executor.clearCells()
+        self.updateSimulationView()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

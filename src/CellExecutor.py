@@ -32,3 +32,6 @@ class CellExecutor:
 
     def removeCell(self, cell):
         self.cellList.remove(cell)
+        
+    def clearCells(self):
+        self.cellList.clear()

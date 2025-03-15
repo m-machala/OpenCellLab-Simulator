@@ -5,16 +5,7 @@ from ExportFunctions import ExportFunction, ControlElement
 class Simple2DEnvironment(Environment):
     def __init__(self):
         super().__init__()
-
-        self.exportFunctions = [
-            ExportFunction(self.exportTestButton, "Button", ControlElement.BUTTON),
-            ExportFunction(self.exportTestButton, "Radial button 1", ControlElement.RADIOBUTTON, ["1"]),
-            ExportFunction(self.exportTestButton, "Radial button 2", ControlElement.RADIOBUTTON, ["1"]),            
-            ExportFunction(self.exportTestButton, "Checkbox", ControlElement.CHECKBOX),
-            ExportFunction(self.exportTestSlider, "Slider", ControlElement.SLIDER, [-5, 5, 3]),
-            ExportFunction(self.exportTestSlider, "Spinbox", ControlElement.SPINBOX, [-2, 2, 0])
-        ]
-
+        
     def cellsCycled(self):
         pass
 
@@ -86,9 +77,3 @@ class Simple2DEnvironment(Environment):
 
     def deleteCurrentCell(self):
         self._cellExecutor.removeCell(self._cellExecutor.currentCell)
-
-    def exportTestButton(self):
-        print("button pressed")
-
-    def exportTestSlider(self, value):
-        print("Value changed to: " + str(value))
