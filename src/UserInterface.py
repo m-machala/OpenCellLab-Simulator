@@ -8,6 +8,7 @@ from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent
 import ModuleFinder
 import os
+import sys
 from CellExecutor import CellExecutor
 from ExportFunctions import ExportFunction, ControlElement
 from base_classes.Cell import Cell
@@ -25,8 +26,8 @@ class WelcomeScreen(QMainWindow):
         self.selectedCells = None
 
         # introduction
-        welcomeLabel = QLabel("Welcome to OCL!")
-        mainLayout.addWidget(welcomeLabel)
+        self.welcomeLabel = QLabel("Welcome to OCL!")
+        mainLayout.addWidget(self.welcomeLabel)
 
         infoLabel = QLabel("To begin, please select an environment from the list below.")
         mainLayout.addWidget(infoLabel)
@@ -86,7 +87,14 @@ class WelcomeScreen(QMainWindow):
         self.reloadClicked()
 
     def populateModuleList(self):
-        packages = ModuleFinder.findPackageJSONs(os.path.dirname(os.path.abspath(__file__)) + "\\packages")
+        if getattr(sys, "frozen", False):
+            path = os.path.dirname(sys.executable)
+        else:
+            path = os.path.dirname(os.path.abspath(__file__))
+        
+        path = os.path.join(path, "packages")
+        self.welcomeLabel.setText(path)
+        packages = ModuleFinder.findPackageJSONs(path)
         self.moduleListItems = []
         self.moduleList.clear()
 
@@ -136,7 +144,12 @@ class WelcomeScreen(QMainWindow):
         if selectedModule["package type"] != "environment":
             return
         
-        modules = ModuleFinder.findPackageJSONs(os.path.dirname(os.path.abspath(__file__)) + "\\packages")
+        if getattr(sys, "frozen", False):
+            path = os.path.dirname(sys.executable)
+        else:
+            path = os.path.dirname(os.path.abspath(__file__))
+
+        modules = ModuleFinder.findPackageJSONs(os.path.join(path, "packages"))
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
         self.selectedCells = cellPacks
 

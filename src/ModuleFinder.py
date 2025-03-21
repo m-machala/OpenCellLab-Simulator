@@ -17,7 +17,7 @@ def validatePackageJSON(JSON):
     if "package type" in JSON and JSON["package type"] in validPackages and "package name" in JSON and "package path" in JSON:
         if JSON["package type"] == "cell" and "cell types" in JSON:
             output = True
-            if len(JSON["cell types"]) < 0:
+            if len(JSON["cell types"]) <= 0:
                 output = False
             else:
                 for cellType in JSON["cell types"]:
@@ -37,7 +37,7 @@ def findPackageJSONs(folderPath):
             JSON = json.load(file)
             if validatePackageJSON(JSON):
                 directory = os.path.dirname(path)
-                JSON["package path"] = directory + "\\" + JSON["package path"]
+                JSON["package path"] = os.path.join(directory, JSON["package path"])
                 JSONs.append(JSON)
     return JSONs
 
