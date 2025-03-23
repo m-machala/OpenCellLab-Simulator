@@ -41,31 +41,31 @@ class Renderer(ABC):
     
     # Used for handling the user left-clicking the simulation
     # The data variable contains a tuple of the x and y coordinates
-    def primaryClick(self, data):
+    def _primaryClick(self, data):
         pass
     
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def primaryDrag(self, originalData, newData):
+    def _primaryDrag(self, originalData, newData):
         pass
 
     # Used for handling the user right-clicking the simulation
     # The data variable contains a tuple of the x and y coordinates
-    def secondaryClick(self, data):
+    def _secondaryClick(self, data):
         pass
 
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def secondaryDrag(self, originalData, newData):
+    def _secondaryDrag(self, originalData, newData):
         pass
 
     # Used for handling the user middle-clicking the simulation
     # The data variable contains a tuple of the x and y coordinates
-    def tertiaryClick(self, data):
+    def _tertiaryClick(self, data):
         pass
 
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def tertiaryDrag(self, originalData, newData):
+    def _tertiaryDrag(self, originalData, newData):
         pass
     

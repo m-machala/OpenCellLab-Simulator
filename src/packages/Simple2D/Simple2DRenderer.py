@@ -85,7 +85,7 @@ class Simple2DRenderer(Renderer):
     def setMoveSpeed(self, speed):
         self.moveSpeed = speed
 
-    def primaryDrag(self, originalData, newData):
+    def _primaryDrag(self, originalData, newData):
         self.xCenterPosition += (originalData[0] - newData[0]) / self.scale
         self.yCenterPosition += (originalData[1] - newData[1]) / self.scale
 
