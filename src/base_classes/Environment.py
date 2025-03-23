@@ -56,3 +56,7 @@ class Environment(ABC):
     # originalData represents the interaction data from the initial press, newData represents the current data
     def tertiaryDrag(self, originalData, newData):
         pass
+
+    # This function is called any time the executor has cleared all cells
+    def executorClearedCells(self):
+        pass

@@ -38,3 +38,4 @@ class CellExecutor:
     def clearCells(self):
         self.currentCell = None
         self.cellList.clear()
+        self._environment.executorClearedCells()

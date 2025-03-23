@@ -1,0 +1,24 @@
+{
+    "package type": "cell",
+	"package name": "Game of Life",
+	"author name": "m_machala",
+	"package description": "Game of Life cells. Simulates one GoL step every three simulation steps/",
+	"package image path": "PATH",
+	"package path": "GoL.py",
+	"environment class": "Simple2DEnvironment",
+	"cell types": [
+	{
+		"cell class": "AliveCell",
+		"cell name": "Living cell",
+		"cell description": "Living GoL cell",
+		"cell image path": "PATH"
+	},
+
+	{
+		"cell class": "DeadCell",
+		"cell name": "Dead cell",
+		"cell description": "Dead GoL cell",
+		"cell image path": "PATH"
+	}
+	]
+}
