@@ -19,7 +19,7 @@ class CellExecutor:
                 continue
             self.currentCell.execute()
 
-        self._environment.cellsCycled()
+        self._environment._cellsCycled()
 
     def addCell(self, cell):
         for livingCell in self.cellList:
@@ -38,4 +38,4 @@ class CellExecutor:
     def clearCells(self):
         self.currentCell = None
         self.cellList.clear()
-        self._environment.executorClearedCells()
+        self._environment._executorClearedCells()

@@ -16,47 +16,47 @@ class Environment(ABC):
     # It should be called every time an instance of an environment has been created
     # Both the environment and the executor have a reference to each other
     # This means that the executor can't be set in the __init__ function, as it would create issues with circular assignment
-    def setExecutor(self, cellExecutor):
+    def _setExecutor(self, cellExecutor):
         self._cellExecutor = cellExecutor
 
     # This function is called every time all of the active cells have been executed, and are ready for the next loop
     @abstractmethod
-    def cellsCycled(self):
+    def _cellsCycled(self):
         pass
 
     # Used for handling the user left-clicking the simulation
     # The data variable contains data about the interactions in an arbitrary form set by the renderer
     # Please check your renderer's documentation to see what data is being passed
-    def primaryClick(self, data):
+    def _primaryClick(self, data):
         pass
     
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def primaryDrag(self, originalData, newData):
+    def _primaryDrag(self, originalData, newData):
         pass
 
     # Used for handling the user right-clicking the simulation
     # The data variable contains data about the interactions in an arbitrary form set by the renderer
     # Please check your renderer's documentation to see what data is being passed
-    def secondaryClick(self, data):
+    def _secondaryClick(self, data):
         pass
 
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def secondaryDrag(self, originalData, newData):
+    def _secondaryDrag(self, originalData, newData):
         pass
 
     # Used for handling the user middle-clicking the simulation
     # The data variable contains data about the interactions in an arbitrary form set by the renderer
     # Please check your renderer's documentation to see what data is being passed
-    def tertiaryClick(self, data):
+    def _tertiaryClick(self, data):
         pass
 
     # Same as above but for a click and drag
     # originalData represents the interaction data from the initial press, newData represents the current data
-    def tertiaryDrag(self, originalData, newData):
+    def _tertiaryDrag(self, originalData, newData):
         pass
 
     # This function is called any time the executor has cleared all cells
-    def executorClearedCells(self):
+    def _executorClearedCells(self):
         pass

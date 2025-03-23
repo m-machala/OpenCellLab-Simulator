@@ -14,19 +14,17 @@ class Simple2DEnvironment(Environment):
         else:
             self._cellMap[(x, y)] = cell
         
-    def cellsCycled(self):
+    def _cellsCycled(self):
         self._stepCount += 1
 
-    def primaryClick(self, data):
+    def _primaryClick(self, data):
         self.addUserCell(data)
 
-    def primaryDrag(self, originalData, newData):
+    def _primaryDrag(self, originalData, newData):
         self.addUserCell(newData)
 
-    def executorClearedCells(self):
+    def _executorClearedCells(self):
         self._cellMap = {}
-        for cell in self._cellExecutor.cellList:
-            self._cellMap[(cell.cellData["xPosition"], cell.cellData["yPosition"])] = cell
 
     def addUserCell(self, data):
         xCoordinate = data[0]
@@ -41,10 +39,10 @@ class Simple2DEnvironment(Environment):
         self._spawnCell(xCoordinate, yCoordinate, newCellBrain)
 
     
-    def secondaryClick(self, data):
+    def _secondaryClick(self, data):
         self.userRemoveCell(data)
 
-    def secondaryDrag(self, originalData, newData):
+    def _secondaryDrag(self, originalData, newData):
         self.userRemoveCell(newData)        
             
     def userRemoveCell(self, data):

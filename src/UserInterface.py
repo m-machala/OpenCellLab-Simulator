@@ -372,7 +372,7 @@ class MainScreen(QMainWindow):
 
         self.executor = CellExecutor(self.environment, [])
 
-        self.environment.setExecutor(self.executor)
+        self.environment._setExecutor(self.executor)
 
         if self.executor == None:
             self.loadingFailed()
@@ -559,7 +559,7 @@ class MainScreen(QMainWindow):
         
         self.originalLeft = processedCoordinates
         if self.clickModeAction.isChecked():
-            receiver.primaryClick(processedCoordinates)
+            receiver._primaryClick(processedCoordinates)
         self.updateSimulationView()
 
     def imageRightClicked(self, x, y):
@@ -570,7 +570,7 @@ class MainScreen(QMainWindow):
         
         self.originalRight = processedCoordinates
         if self.clickModeAction.isChecked():
-            receiver.secondaryClick(processedCoordinates)
+            receiver._secondaryClick(processedCoordinates)
         self.updateSimulationView()
 
     def imageMiddleClicked(self, x, y):
@@ -581,7 +581,7 @@ class MainScreen(QMainWindow):
         
         self.originalMiddle = processedCoordinates
         if self.clickModeAction.isChecked():
-            receiver.tertiaryClick(processedCoordinates)
+            receiver._tertiaryClick(processedCoordinates)
         self.updateSimulationView()
 
 
@@ -592,7 +592,7 @@ class MainScreen(QMainWindow):
         if not receiver or not processedCoordinates:
             return
         
-        receiver.primaryDrag(self.originalLeft, processedCoordinates)
+        receiver._primaryDrag(self.originalLeft, processedCoordinates)
         self.originalLeft = processedCoordinates
         self.updateSimulationView()
 
@@ -603,7 +603,7 @@ class MainScreen(QMainWindow):
         if not receiver or not processedCoordinates:
             return
         
-        receiver.secondaryDrag(self.originalRight, processedCoordinates)
+        receiver._secondaryDrag(self.originalRight, processedCoordinates)
         self.originalRight = processedCoordinates
         self.updateSimulationView()
 
@@ -614,7 +614,7 @@ class MainScreen(QMainWindow):
         if not receiver or not processedCoordinates:
             return
         
-        receiver.tertiaryDrag(self.originalMiddle, processedCoordinates)
+        receiver._tertiaryDrag(self.originalMiddle, processedCoordinates)
         self.originalMiddle = processedCoordinates
         self.updateSimulationView()
         
