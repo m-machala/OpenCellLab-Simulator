@@ -3,8 +3,8 @@ from base_classes.Cell import Cell
 from ExportFunctions import ExportFunction, ControlElement
 
 class Simple2DEnvironment(Environment):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, renderer):
+        super().__init__(renderer)
         self._stepCount = 0
         self._cellMap = {}
 

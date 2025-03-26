@@ -368,7 +368,7 @@ class MainScreen(QMainWindow):
         
         # instantiate main modules and connect them
         self.renderer = rendererReference(self.simulationImageLabel.width(), self.simulationImageLabel.height())
-        self.environment = environmentReference()
+        self.environment = environmentReference(self.renderer)
 
         self.executor = CellExecutor(self.environment, [])
 

@@ -8,9 +8,12 @@ from abc import ABC, abstractmethod
 #   A renderer may work with a 2D coordinate system and RGB colors
 #   This means that all of the cells working with that renderer have to have this data to be rendered properly
 #   It also means that the environment within the renderer should work with this data
+# The renderer may offer some functions which you can call from the environment. Check your renderer's documentation for more info
+# Functions and variables starting with _ are private, therefore you should not use them, otherwise you risk breaking things
 class Environment(ABC):   
-    def __init__(self):
+    def __init__(self, renderer):
         self.exportFunctions = []
+        self._renderer = renderer
 
     # This function sets the internal reference to the executor class
     # It should be called every time an instance of an environment has been created
