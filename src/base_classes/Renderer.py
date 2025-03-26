@@ -11,8 +11,8 @@ class Renderer(ABC):
     #     super().__init__(outputResolutionW, outputResolutionH)
 
     def __init__(self, outputResolutionW, outputResolutionH):
-        self.setOutputResolution(outputResolutionW, outputResolutionH)
-        self.exportFunctions = []
+        self._setOutputResolution(outputResolutionW, outputResolutionH)
+        self._exportFunctions = []
 
     # The render function should return an image in the output resolution 
     # set in the constructor/setOutputResolution function.
@@ -30,14 +30,14 @@ class Renderer(ABC):
 
     # Sets the output resolution. This function is called whenever the simulation window in the UI is resized
     # W is width, H is height
-    def setOutputResolution(self, outputResolutionW, outputResolutionH):
+    def _setOutputResolution(self, outputResolutionW, outputResolutionH):
         self.outputResolutionW = outputResolutionW
         self.outputResolutionH = outputResolutionH
 
     # Returns a list of functions to be exported into the UI
     # For more info check ExportFunctions.py
-    def getExportFunctions(self):
-        return self.exportFunctions
+    def _getExportFunctions(self):
+        return self._exportFunctions
     
     # Used for handling the user left-clicking the simulation
     # The data variable contains a tuple of the x and y coordinates

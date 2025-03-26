@@ -397,7 +397,7 @@ class MainScreen(QMainWindow):
 
         # renderer exports
         self.radioGroupsRenderer = {}
-        for exportFunction in self.renderer.exportFunctions:
+        for exportFunction in self.renderer._exportFunctions:
             element = self.buildExportElement(exportFunction, True)
             self.rendererExportsInnerLayout.addWidget(element)
         self.rendererExportsInnerLayout.addStretch(1)
@@ -531,7 +531,7 @@ class MainScreen(QMainWindow):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.renderer.setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
+        self.renderer._setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.updateSimulationView()
 
     def updateSimulationView(self):
@@ -621,7 +621,7 @@ class MainScreen(QMainWindow):
 
     def showEvent(self, event):
         super().showEvent(event)
-        self.renderer.setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
+        self.renderer._setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.updateSimulationView()
 
 
