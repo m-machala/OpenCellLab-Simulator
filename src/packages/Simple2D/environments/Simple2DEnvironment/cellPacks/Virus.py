@@ -1,12 +1,12 @@
 from base_classes.CellBrain import CellBrain
 
-class TestCell(CellBrain):
+class Virus(CellBrain):
     COLOR = (0, 255, 127)
     def run(self):
-        topCell = TestCell(self._environment)
-        bottomCell = TestCell(self._environment)
-        leftCell = TestCell(self._environment)
-        rightCell = TestCell(self._environment)
+        topCell = Virus(self._environment)
+        bottomCell = Virus(self._environment)
+        leftCell = Virus(self._environment)
+        rightCell = Virus(self._environment)
 
         self._environment.spawnCell(0, -1, topCell)
         self._environment.spawnCell(0, 1, bottomCell)
