@@ -151,12 +151,13 @@ class WelcomeScreen(QMainWindow):
 
         modules = ModuleFinder.findPackageJSONs(os.path.join(path, "packages"))
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
-        self.selectedCells = cellPacks
+        self.selectedCells = []
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
                 self.cellList.addItem(cellPack["package name"])
                 self.cellListItems.append(cellPack)
+                self.selectedCells.append(cellPack)
 
 
     def cellPackSelectionChanged(self, item):

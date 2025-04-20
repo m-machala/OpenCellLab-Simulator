@@ -22,6 +22,8 @@ class Simple2DRenderer(Renderer):
             ExportFunction(self._setMoveSpeed, "Camera speed", ControlElement.SLIDER, [1, 25, 1])            
         ]
 
+        self._backgroundColor = (0, 0, 0)
+
     def render(self, simple2DCellList):
         outputBaseWidth = self.outputResolutionW
         outputBaseHeight = self.outputResolutionH
@@ -31,7 +33,7 @@ class Simple2DRenderer(Renderer):
         gridLeftBound = self._xCenterPosition - outputBaseWidth / (2 * self._scale)
         gridRightBound = self._xCenterPosition + outputBaseWidth / (2 * self._scale)
 
-        outputImage = Image.new("RGB", (outputBaseWidth, outputBaseHeight))
+        outputImage = Image.new("RGB", (outputBaseWidth, outputBaseHeight), color = self._backgroundColor)
         outputImageDraw = ImageDraw.Draw(outputImage)
         if outputImageDraw is None:
             return None
@@ -57,6 +59,9 @@ class Simple2DRenderer(Renderer):
         outputImage.save(buffer, format="PNG")
         return buffer.getvalue()
     
+    def setBackgroundColor(self, colorTuple):
+        self._backgroundColor = colorTuple
+
     def convertFromImageCoordinates(self, xCoordinate, yCoordinate):
         xConverted = math.floor((xCoordinate / self._scale) + (self._xCenterPosition - self.outputResolutionW / (2 * self._scale)))
         yConverted = math.floor((yCoordinate / self._scale) + (self._yCenterPosition - self.outputResolutionH / (2 * self._scale)))

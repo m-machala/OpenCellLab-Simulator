@@ -23,8 +23,11 @@ class Environment(ABC):
         self._cellExecutor = cellExecutor
 
     # This function is called every time all of the active cells have been executed, and are ready for the next loop
-    @abstractmethod
     def _cellsCycled(self):
+        pass
+
+    # This function is called every time the executor is about to execute the code of a cell. The currentCell variable should already be set.
+    def _cellSwitched(self):
         pass
 
     # Used for handling the user left-clicking the simulation
