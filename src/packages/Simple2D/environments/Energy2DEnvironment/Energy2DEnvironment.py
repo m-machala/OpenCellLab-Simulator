@@ -9,7 +9,7 @@ class Energy2DEnvironment(Environment):
         self._cellMap = {}
         
     def _getEnvironmentEnergyLevel(self):
-        return math.cos((self._stepCount) * math.pi / 30) / -10
+        return max(math.cos(self._stepCount * math.pi / 30) / -10, -0.075)
 
     def _updateCellMap(self, x, y, cell = None):
         if cell == None:
@@ -19,8 +19,8 @@ class Energy2DEnvironment(Environment):
         
     def _cellsCycled(self):
         self._stepCount += 1
-        colorLevel = int((self._getEnvironmentEnergyLevel() + 0.1) * 5 * 127)
-        self._renderer.setBackgroundColor((colorLevel, colorLevel, 0))
+        colorLevel = int((self._getEnvironmentEnergyLevel()) * 10 * 127)
+        self._renderer.setBackgroundColor((colorLevel, colorLevel, -colorLevel))
 
     def _cellSwitched(self):
         currentCell = self._cellExecutor.currentCell
@@ -228,7 +228,7 @@ class Energy2DEnvironment(Environment):
         self._cellActed = True
 
     def sendMessage(self, xDirection, yDirection, message):
-        messageCost = 0.01
+        messageCost = 0.05
         if self._cellActed:
             return
 
@@ -261,4 +261,13 @@ class Energy2DEnvironment(Environment):
             return
         message = currentCell["messages"][0]
         return currentCell["messages"].pop(0)
+    
+    def rest(self):
+        if self._cellActed:
+            return
+        currentCell = self._cellExecutor.currentCell
+        if currentCell == None:
+            return
+        currentCell["energy"] += 0.1
+        self._cellActed = True
         
