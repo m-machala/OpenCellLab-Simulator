@@ -125,6 +125,7 @@ class Energy2DEnvironment(Environment):
         else:
             newCell.cellData["color"] = (255, 255, 255)
         newCell.cellData["energy"] = 0.5
+        newCell.cellData["messages"] = []
         
         self._cellExecutor.addCell(newCell)
 
@@ -225,3 +226,39 @@ class Energy2DEnvironment(Environment):
         self._cellMap[("newXPosition", "newYPosition")]["energy"] += trueEnergyValue
 
         self._cellActed = True
+
+    def sendMessage(self, xDirection, yDirection, message):
+        messageCost = 0.01
+        if self._cellActed:
+            return
+
+        currentCell = self._cellExecutor.currentCell
+        if currentCell == None or currentCell["energy"] < messageCost:
+            return
+        oldXPosition = currentCell["xPosition"]
+        oldYPosition = currentCell["yPosition"]
+        xDirection, yDirection = self._determineDirection(xDirection, yDirection)
+        newXPosition = oldXPosition + xDirection
+        newYPosition = oldYPosition + yDirection
+
+        if not self._checkForCellAbsolute(newXPosition, newYPosition):
+            return
+        
+        currentCell["energy"] -= messageCost
+        self._cellMap[("newXPosition", "newYPosition")]["messages"].append(message)
+
+        self._cellActed = True
+
+    def getMessageCount(self):
+        currentCell = self._cellExecutor.currentCell
+        if currentCell == None:
+            return
+        return currentCell["messages"].count()
+    
+    def getTopMessage(self):
+        currentCell = self._cellExecutor.currentCell
+        if currentCell == None or currentCell["messages"].count() < 1:
+            return
+        message = currentCell["messages"][0]
+        return currentCell["messages"].pop(0)
+        
