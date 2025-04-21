@@ -25,7 +25,7 @@ class Energy2DEnvironment(Environment):
     def _cellSwitched(self):
         currentCell = self._cellExecutor.currentCell
         currentCell.cellData["energy"] += self._getEnvironmentEnergyLevel()
-        if 0 >= currentCell.cellData["energy"] or 1 < currentCell.cellData["energy"]:
+        if 0 >= currentCell.cellData["energy"] or 1 < currentCell.cellData["energy"] or currentCell.cellData["xPosition"] < -25 or currentCell.cellData["xPosition"] > 25 or currentCell.cellData["yPosition"] < -25 or currentCell.cellData["yPosition"] > 25:
             self.deleteCurrentCell()
         self._cellActed = False
 
