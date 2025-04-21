@@ -1,15 +1,40 @@
 from base_classes.Environment import Environment
 from base_classes.Cell import Cell
 import math
+from ExportFunctions import ExportFunction, ControlElement
 
 class Energy2DEnvironment(Environment):
     def __init__(self, renderer):
         super().__init__(renderer)
         self._stepCount = 0
         self._cellMap = {}
+        self._topEnergy = 0.1
+        self._bottomEnergy = 0.1
+        self._arenaSize = 25
+
+        self.exportFunctions = [
+            ExportFunction(self._setTopEnergy, "Peak positive energy", ControlElement.SLIDER, [0, 50, 10]),
+            ExportFunction(self._setBottomEnergy, "Peak negative energy", ControlElement.SLIDER, [0, 50, 10]),
+            ExportFunction(self._setArenaSize, "Arena size", ControlElement.SLIDER, [10, 100, 25])
+        ]
         
+    def _setTopEnergy(self, value):
+        self._topEnergy = value / 100
+
+    def _setBottomEnergy(self, value):
+        self._bottomEnergy = value / 100
+
+    def _setArenaSize(self, value):
+        self._arenaSize = value
+
+
     def _getEnvironmentEnergyLevel(self):
-        return math.cos(self._stepCount * math.pi / 30) / 10
+        cosValue = math.sin(self._stepCount * math.pi / 30)
+        if cosValue > 0:
+            return self._topEnergy * cosValue
+        elif cosValue < 0:
+            return self._bottomEnergy * cosValue
+        return 0
 
     def _updateCellMap(self, x, y, cell = None):
         if cell == None:
@@ -19,13 +44,13 @@ class Energy2DEnvironment(Environment):
         
     def _cellsCycled(self):
         self._stepCount += 1
-        colorLevel = int((self._getEnvironmentEnergyLevel()) * 10 * 127)
+        colorLevel = int((self._getEnvironmentEnergyLevel()) * 255 * 2)
         self._renderer.setBackgroundColor((colorLevel, colorLevel, -colorLevel))
 
     def _cellSwitched(self):
         currentCell = self._cellExecutor.currentCell
         currentCell.cellData["energy"] += self._getEnvironmentEnergyLevel()
-        if 0 >= currentCell.cellData["energy"] or 1 < currentCell.cellData["energy"] or currentCell.cellData["xPosition"] < -25 or currentCell.cellData["xPosition"] > 25 or currentCell.cellData["yPosition"] < -25 or currentCell.cellData["yPosition"] > 25:
+        if 0 >= currentCell.cellData["energy"] or 1 < currentCell.cellData["energy"] or currentCell.cellData["xPosition"] < -self._arenaSize or currentCell.cellData["xPosition"] > self._arenaSize or currentCell.cellData["yPosition"] < -self._arenaSize or currentCell.cellData["yPosition"] > self._arenaSize:
             self.deleteCurrentCell()
         self._cellActed = False
 
@@ -272,4 +297,10 @@ class Energy2DEnvironment(Environment):
             return
         currentCell.cellData["energy"] += 0.1
         self._cellActed = True
+
+    def changeColor(self, colorTuple):
+        currentCell = self._cellExecutor.currentCell
+        if currentCell == None:
+            return
+        currentCell.cellData["color"] = colorTuple
         

@@ -14,7 +14,7 @@ class GeneticCell(CellBrain):
                 if len(firstGenome) < i + 1 or len(secondGenome) < i + 1 or random.random() < mutationRate:
                     self.genome.append(random.randint(1, 1000))
                 else:
-                    self.genome.append((int(firstGenome[i]), int(secondGenome[i]))[random.randint(0, 1)])                   
+                    self.genome.append(max(0, min(1000, (int(firstGenome[i]), int(secondGenome[i]))[random.randint(0, 1)])))                   
         else:
             for i in range(genomeSize):
                 self.genome.append(random.randint(1, 1000))
@@ -22,7 +22,19 @@ class GeneticCell(CellBrain):
         self.messageMemory = None
         self.variable = 200
 
+        self.colorSet = False
+
     def run(self):
+        if not self.colorSet:
+            newColor = [0, 0, 0]
+            third = len(self.genome) // 3
+            for i in range(third):
+                newColor[0] += self.genome[i]
+                newColor[1] += self.genome[i * 2]
+                newColor[2] += self.genome[i * 3]
+
+            self._environment.changeColor((newColor[0] // third % 256, newColor[1] // third % 256, newColor[2] // third % 256))
+            self.colorSet = True
         i = 0
         while i < len(self.genome):
             currentInstruction = self.genome[i] % 14
