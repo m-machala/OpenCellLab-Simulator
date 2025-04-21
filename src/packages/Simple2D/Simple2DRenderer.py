@@ -7,7 +7,7 @@ import math
 class Simple2DRenderer(Renderer):
     def __init__(self, outputResolutionW, outputResolutionH):
         super().__init__(outputResolutionW, outputResolutionH)
-        self._scale = 1
+        self._scale = 16
         self._moveSpeed = 1
         self._xCenterPosition = 0
         self._yCenterPosition = 0

@@ -19,7 +19,6 @@ class GeneticCell(CellBrain):
             for i in range(genomeSize):
                 self.genome.append(random.randint(1, 1000))
 
-        self.messageMemory = None
         self.variable = 200
 
         self.colorSet = False
@@ -45,40 +44,39 @@ class GeneticCell(CellBrain):
             if currentInstruction == 1:
                 self._environment.rest()
             elif currentInstruction == 2:
-                self.messageMemory = self._environment.getTopMessage()
-            elif currentInstruction == 3:
                 if self.variable > 100:
-                    if self.messageMemory != None:
-                        secondGenome = self.messageMemory
+                    messageMemory = self._environment.getTopMessage()
+                    if messageMemory != None:
+                        secondGenome = messageMemory
                     else:
                         secondGenome = self.genome
                     newCellBrain = GeneticCell(self._environment, self.genome, secondGenome)
                     self._environment.spawnCell(direction[0], direction[1], newCellBrain)
                     i += 1
                         
-            elif currentInstruction == 4:
+            elif currentInstruction == 3:
                 self.variable += nextNumber
-            elif currentInstruction == 5:
+            elif currentInstruction == 4:
                 self.variable -= nextNumber
-            elif currentInstruction == 6:
+            elif currentInstruction == 5:
                 self.variable += currentEnergy * 10
-            elif currentInstruction == 7:
+            elif currentInstruction == 6:
                 self.variable -= currentEnergy * 10
-            elif currentInstruction == 8:
+            elif currentInstruction == 7:
                 self.variable = 0
-            elif currentInstruction == 9:
+            elif currentInstruction == 8:
                 self._environment.move(direction[0], direction[1])
                 i += 1
-            elif currentInstruction == 10:
+            elif currentInstruction == 9:
                 self._environment.deleteCurrentCell()
-            elif currentInstruction == 11:
+            elif currentInstruction == 10:
                 self._environment.checkForCell(direction[0], direction[1])
                 i += 1
-            elif currentInstruction == 12:
+            elif currentInstruction == 11:
                 if self.variable > 100:
                     self._environment.sendMessage(direction[0], direction[1], self.genome)
                     i += 1
-            elif currentEnergy == 13:
+            elif currentInstruction == 12:
                 if self.variable > 0:
                     self._environment.giveEnergy(direction[0], direction[1], 1 / max(1, self.variable))
             i += 1

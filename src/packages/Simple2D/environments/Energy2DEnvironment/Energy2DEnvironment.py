@@ -250,7 +250,7 @@ class Energy2DEnvironment(Environment):
         
         trueEnergyValue = min(max(0, energyValue), currentCell.cellData["energy"])
         currentCell.cellData["energy"] -= trueEnergyValue
-        self._cellMap[("newXPosition", "newYPosition")]["energy"] += trueEnergyValue
+        self._cellMap[(newXPosition, newYPosition)].cellData["energy"] += trueEnergyValue
 
         self._cellActed = True
 
