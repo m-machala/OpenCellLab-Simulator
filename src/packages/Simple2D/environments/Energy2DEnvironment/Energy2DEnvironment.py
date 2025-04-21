@@ -9,7 +9,7 @@ class Energy2DEnvironment(Environment):
         self._cellMap = {}
         
     def _getEnvironmentEnergyLevel(self):
-        return max(math.cos(self._stepCount * math.pi / 30) / -10, -0.075)
+        return math.cos(self._stepCount * math.pi / 30) / 10
 
     def _updateCellMap(self, x, y, cell = None):
         if cell == None:
@@ -24,8 +24,8 @@ class Energy2DEnvironment(Environment):
 
     def _cellSwitched(self):
         currentCell = self._cellExecutor.currentCell
-        currentCell["energy"] += self._getEnvironmentEnergyLevel()
-        if 0 >= currentCell["energy"] or 1 < currentCell["energy"]:
+        currentCell.cellData["energy"] += self._getEnvironmentEnergyLevel()
+        if 0 >= currentCell.cellData["energy"] or 1 < currentCell.cellData["energy"]:
             self.deleteCurrentCell()
         self._cellActed = False
 
@@ -79,9 +79,9 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return True
-        if currentCell["energy"] < cellCheckCost:
+        if currentCell.cellData["energy"] < cellCheckCost:
             return True
-        currentCell["energy"] -= cellCheckCost
+        currentCell.cellData["energy"] -= cellCheckCost
         
         currentCellX = currentCell.cellData["xPosition"]
         currentCellY = currentCell.cellData["yPosition"]
@@ -98,9 +98,9 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return True
-        if currentCell["energy"] < cellCheckCost:
+        if currentCell.cellData["energy"] < cellCheckCost:
             return True
-        currentCell["energy"] -= cellCheckCost
+        currentCell.cellData["energy"] -= cellCheckCost
         
         currentCellX = currentCell.cellData["xPosition"]
         currentCellY = currentCell.cellData["yPosition"]
@@ -137,8 +137,8 @@ class Energy2DEnvironment(Environment):
             return
 
         currentCell = self._cellExecutor.currentCell
-        oldXPosition = currentCell["xPosition"]
-        oldYPosition = currentCell["yPosition"]
+        oldXPosition = currentCell.cellData["xPosition"]
+        oldYPosition = currentCell.cellData["yPosition"]
         xDirection, yDirection = self._determineDirection(xDirection, yDirection)
         newXPosition = oldXPosition + xDirection
         newYPosition = oldYPosition + yDirection
@@ -165,7 +165,9 @@ class Energy2DEnvironment(Environment):
         return self._stepCount
     
     def getEnergyLevel(self):
-        return self._cellExecutor.currentCell["energy"]
+        if self._cellExecutor.currentCell == None:
+            return 0
+        return self._cellExecutor.currentCell.cellData["energy"]
     
     def _determineDirection(self, x, y):
         newX = 0
@@ -188,20 +190,20 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return
-        oldXPosition = currentCell["xPosition"]
-        oldYPosition = currentCell["yPosition"]
+        oldXPosition = currentCell.cellData["xPosition"]
+        oldYPosition = currentCell.cellData["yPosition"]
         xDirection, yDirection = self._determineDirection(xDirection, yDirection)
         newXPosition = oldXPosition + xDirection
         newYPosition = oldYPosition + yDirection
 
         if not self._checkForCellAbsolute(newXPosition, newYPosition):
-            currentCell["xPosition"] = newXPosition
-            currentCell["yPosition"] = newYPosition
+            currentCell.cellData["xPosition"] = newXPosition
+            currentCell.cellData["yPosition"] = newYPosition
 
             self._updateCellMap(oldXPosition, oldYPosition)
             self._updateCellMap(newXPosition, newYPosition, currentCell)
 
-            currentCell["energy"] -= movementCost
+            currentCell.cellData["energy"] -= movementCost
 
             self._cellActed = True
 
@@ -212,8 +214,8 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return
-        oldXPosition = currentCell["xPosition"]
-        oldYPosition = currentCell["yPosition"]
+        oldXPosition = currentCell.cellData["xPosition"]
+        oldYPosition = currentCell.cellData["yPosition"]
         xDirection, yDirection = self._determineDirection(xDirection, yDirection)
         newXPosition = oldXPosition + xDirection
         newYPosition = oldYPosition + yDirection
@@ -221,8 +223,8 @@ class Energy2DEnvironment(Environment):
         if not self._checkForCellAbsolute(newXPosition, newYPosition):
             return
         
-        trueEnergyValue = min(max(0, energyValue), currentCell["energy"])
-        currentCell["energy"] -= trueEnergyValue
+        trueEnergyValue = min(max(0, energyValue), currentCell.cellData["energy"])
+        currentCell.cellData["energy"] -= trueEnergyValue
         self._cellMap[("newXPosition", "newYPosition")]["energy"] += trueEnergyValue
 
         self._cellActed = True
@@ -233,10 +235,10 @@ class Energy2DEnvironment(Environment):
             return
 
         currentCell = self._cellExecutor.currentCell
-        if currentCell == None or currentCell["energy"] < messageCost:
+        if currentCell == None or currentCell.cellData["energy"] < messageCost:
             return
-        oldXPosition = currentCell["xPosition"]
-        oldYPosition = currentCell["yPosition"]
+        oldXPosition = currentCell.cellData["xPosition"]
+        oldYPosition = currentCell.cellData["yPosition"]
         xDirection, yDirection = self._determineDirection(xDirection, yDirection)
         newXPosition = oldXPosition + xDirection
         newYPosition = oldYPosition + yDirection
@@ -244,8 +246,8 @@ class Energy2DEnvironment(Environment):
         if not self._checkForCellAbsolute(newXPosition, newYPosition):
             return
         
-        currentCell["energy"] -= messageCost
-        self._cellMap[("newXPosition", "newYPosition")]["messages"].append(message)
+        currentCell.cellData["energy"] -= messageCost
+        self._cellMap[(newXPosition, newYPosition)].cellData["messages"].append(message)
 
         self._cellActed = True
 
@@ -253,14 +255,14 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return
-        return currentCell["messages"].count()
+        return len(currentCell.cellData["messages"])
     
     def getTopMessage(self):
         currentCell = self._cellExecutor.currentCell
-        if currentCell == None or currentCell["messages"].count() < 1:
-            return
-        message = currentCell["messages"][0]
-        return currentCell["messages"].pop(0)
+        if currentCell == None or len(currentCell.cellData["messages"]) < 1:
+            return None
+        message = currentCell.cellData["messages"][0]
+        return currentCell.cellData["messages"].pop(0)
     
     def rest(self):
         if self._cellActed:
@@ -268,6 +270,6 @@ class Energy2DEnvironment(Environment):
         currentCell = self._cellExecutor.currentCell
         if currentCell == None:
             return
-        currentCell["energy"] += 0.1
+        currentCell.cellData["energy"] += 0.1
         self._cellActed = True
         

@@ -14,9 +14,11 @@ class CellExecutor:
     def cycleCells(self):
         cellListCopy = self.cellList.copy()
         for i in range(len(cellListCopy)):
-            self._environment._cellSwitched()
             self.currentCell = cellListCopy[i]
-            if self.currentCell.cellBrain == None:
+            if self.currentCell == None or self.currentCell.cellBrain == None:
+                continue
+            self._environment._cellSwitched()
+            if self.currentCell == None or self.currentCell.cellBrain == None:
                 continue
             self.currentCell.execute()
 
