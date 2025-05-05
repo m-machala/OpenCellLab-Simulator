@@ -93,7 +93,7 @@ class WelcomeScreen(QMainWindow):
             path = os.path.dirname(os.path.abspath(__file__))
         
         path = os.path.join(path, "packages")
-        self.welcomeLabel.setText(path)
+        #self.welcomeLabel.setText(path)
         packages = ModuleFinder.findPackageJSONs(path)
         self.moduleListItems = []
         self.moduleList.clear()
