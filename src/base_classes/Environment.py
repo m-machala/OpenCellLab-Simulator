@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 # Functions and variables starting with _ are private, therefore you should not use them, otherwise you risk breaking things
 class Environment(ABC):   
     def __init__(self, renderer):
-        self.exportFunctions = []
+        self._exportFunctions = []
         self._renderer = renderer
 
     # This function sets the internal reference to the executor class

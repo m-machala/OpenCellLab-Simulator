@@ -34,11 +34,6 @@ class Renderer(ABC):
     def _setOutputResolution(self, outputResolutionW, outputResolutionH):
         self.outputResolutionW = outputResolutionW
         self.outputResolutionH = outputResolutionH
-
-    # Returns a list of functions to be exported into the UI
-    # For more info check ExportFunctions.py
-    def _getExportFunctions(self):
-        return self._exportFunctions
     
     # Used for handling the user left-clicking the simulation
     # The data variable contains a tuple of the x and y coordinates

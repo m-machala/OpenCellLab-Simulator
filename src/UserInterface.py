@@ -405,7 +405,7 @@ class MainScreen(QMainWindow):
 
         # environment exports
         self.radioGroupsEnvironment = {}
-        for exportFunction in self.environment.exportFunctions:
+        for exportFunction in self.environment._exportFunctions:
             element = self.buildExportElement(exportFunction, False)
             self.environmentExportsInnerLayout.addWidget(element)
         self.environmentExportsInnerLayout.addStretch(1)
