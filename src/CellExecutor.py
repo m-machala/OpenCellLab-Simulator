@@ -11,7 +11,7 @@ class CellExecutor:
     def selectCellBrainReference(self, cellBrain):
         self.selectedCellBrainReference = cellBrain
 
-    def cycleCells(self):
+    def _cycleCells(self):
         cellListCopy = self.cellList.copy()
         for i in range(len(cellListCopy)):
             self.currentCell = cellListCopy[i]

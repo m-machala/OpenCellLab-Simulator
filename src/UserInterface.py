@@ -518,7 +518,7 @@ class MainScreen(QMainWindow):
         return outputElement
     
     def simulationTimerTriggered(self):
-        self.executor.cycleCells()
+        self.executor._cycleCells()
         self.updateSimulationView()
 
     def stepClicked(self):
