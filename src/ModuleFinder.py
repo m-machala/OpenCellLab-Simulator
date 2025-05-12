@@ -14,17 +14,17 @@ def findAllJSONs(folderPath):
 validPackages = ["renderer", "environment", "cell"]
 def validatePackageJSON(JSON):
     output = False
-    if "package type" in JSON and JSON["package type"] in validPackages and "package name" in JSON and "package path" in JSON:
+    if "package type" in JSON and JSON["package type"] in validPackages and "package name" in JSON and JSON["package name"] != "" and "package path" in JSON and JSON["package path"] != "":
         if JSON["package type"] == "cell" and "cell types" in JSON:
             output = True
             if len(JSON["cell types"]) <= 0:
                 output = False
             else:
                 for cellType in JSON["cell types"]:
-                    if not ("cell name" in cellType and "cell class" in cellType):
+                    if not ("cell name" in cellType and "cell class" in cellType and cellType["cell name"] != "" and cellType["cell class"] != ""):
                         output = False
         else:
-            if "package class" in JSON:
+            if "package class" in JSON and JSON["package class"] != "":
                 output = True
             
     return output
@@ -60,17 +60,15 @@ def removeJSONsWithoutDependencies(JSONList):
 
     rendererClassNames = []
     for renderer in renderers:
-        if "package class" in renderer and renderer["package class"] != "":
-            rendererClassNames.append(renderer["package class"])
+        rendererClassNames.append(renderer["package class"])
     
     validEnvironments = []
     environmentClassNames = []
     for environment in environments:
-        if "package class" in environment and environment["package class"] != "":
-            if "renderer class" in environment and environment["renderer class"] != "":
-                if environment["renderer class"] in rendererClassNames:
-                    environmentClassNames.append(environment["package class"])
-                    validEnvironments.append(environment)
+        if "renderer class" in environment and environment["renderer class"] != "":
+            if environment["renderer class"] in rendererClassNames:
+                environmentClassNames.append(environment["package class"])
+                validEnvironments.append(environment)
                     
     validCellPacks = []
     for cellPack in cellPacks:
