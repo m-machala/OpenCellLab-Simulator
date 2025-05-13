@@ -79,7 +79,7 @@ def removeJSONsWithoutDependencies(JSONList):
     return (renderers, validEnvironments, validCellPacks)
 
 def loadRenderer(rendererJSON):
-    moduleSpec = importlib.util.spec_from_file_location("LoadedRenderer", rendererJSON["package path"])
+    moduleSpec = importlib.util.spec_from_file_location(rendererJSON["package name"], rendererJSON["package path"])
     if moduleSpec is None:
         return None
     foundModule = importlib.util.module_from_spec(moduleSpec)
@@ -93,23 +93,11 @@ def loadRenderer(rendererJSON):
         return None
 
 def loadEnvironment(environmentJSON):
-    moduleSpec = importlib.util.spec_from_file_location("LoadedEnvironment", environmentJSON["package path"])
-    if moduleSpec is None:
-        return None   
-    foundModule = importlib.util.module_from_spec(moduleSpec)
-
-    try:
-        moduleSpec.loader.exec_module(foundModule) # type: ignore
-        classReference = getattr(foundModule, environmentJSON["package class"])
-
-        return classReference
-
-    except Exception as e:
-        return None
+    return loadRenderer(environmentJSON)
 
 def loadCellPack(cellPackJSON):
     cells = []
-    moduleSpec = importlib.util.spec_from_file_location("LoadedCellPack", cellPackJSON["package path"])
+    moduleSpec = importlib.util.spec_from_file_location(cellPackJSON["package name"], cellPackJSON["package path"])
     if moduleSpec is None:
         return cells
     
