@@ -23,7 +23,7 @@ class WelcomeScreen(QMainWindow):
 
         self.selectedEnvironment = None
         self.selectedRenderer = None
-        self.selectedCells = None
+        self.selectedCells = []
 
         # introduction
         self.welcomeLabel = QLabel("Welcome to OCL!")
@@ -132,7 +132,7 @@ class WelcomeScreen(QMainWindow):
         else:
             self.selectedEnvironment = None
             self.selectedRenderer = None
-            self.selectedCells = None
+            self.selectedCells = []
 
             self.beginButton.setDisabled(True)
             self.cellList.clear()
@@ -142,7 +142,6 @@ class WelcomeScreen(QMainWindow):
         if selectedModule["package type"] != "environment":
             return
         self.cellList.clear()
-        self.cellListItems = []
         
         if getattr(sys, "frozen", False):
             path = os.path.dirname(sys.executable)
@@ -156,14 +155,13 @@ class WelcomeScreen(QMainWindow):
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
                 self.cellList.addItem(cellPack["package name"])
-                self.cellListItems.append(cellPack)
                 self.selectedCells.append(cellPack)
 
 
     def cellPackSelectionChanged(self, item):
         packIndex = self.cellList.row(item)
 
-        module = self.cellListItems[packIndex]
+        module = self.selectedCells[packIndex]
         if "package description" in module:
             self.setModuleInfoText(module["package description"])
         else:
