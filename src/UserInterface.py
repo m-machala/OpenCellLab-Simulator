@@ -139,10 +139,10 @@ class WelcomeScreen(QMainWindow):
 
 
     def populateCellPackList(self, selectedModule):
-        self.cellList.clear()
-        self.cellListItems = []
         if selectedModule["package type"] != "environment":
             return
+        self.cellList.clear()
+        self.cellListItems = []
         
         if getattr(sys, "frozen", False):
             path = os.path.dirname(sys.executable)
