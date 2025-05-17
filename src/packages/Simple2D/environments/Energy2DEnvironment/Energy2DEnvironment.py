@@ -12,7 +12,7 @@ class Energy2DEnvironment(Environment):
         self._bottomEnergy = 0.1
         self._arenaSize = 25
 
-        self.exportFunctions = [
+        self._exportFunctions = [
             ExportFunction(self._setTopEnergy, "Peak positive energy", ControlElement.SLIDER, [0, 50, 10]),
             ExportFunction(self._setBottomEnergy, "Peak negative energy", ControlElement.SLIDER, [0, 50, 10]),
             ExportFunction(self._setArenaSize, "Arena size", ControlElement.SLIDER, [10, 100, 25])
