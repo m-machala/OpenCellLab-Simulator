@@ -351,8 +351,6 @@ class MainScreen(QMainWindow):
 
         rendererExportsOuterLayout.addWidget(rendererExports)
 
-        self.radioGroupsRenderer = {}
-        self.radioGroupsEnvironment = {}
         self.reload(rendererData, environmentData, cellPackDataList)
 
     def reload(self, rendererData, environmentData, cellPackDataList):
