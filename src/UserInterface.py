@@ -142,6 +142,7 @@ class WelcomeScreen(QMainWindow):
         if selectedModule["package type"] != "environment":
             return
         self.cellList.clear()
+        self.selectedCells = []
         
         if getattr(sys, "frozen", False):
             path = os.path.dirname(sys.executable)
@@ -150,7 +151,6 @@ class WelcomeScreen(QMainWindow):
 
         modules = ModuleFinder.findPackageJSONs(os.path.join(path, "packages"))
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
-        self.selectedCells = []
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
@@ -381,11 +381,11 @@ class MainScreen(QMainWindow):
         self.cellListWidget.clear()
         self.cellList = []
         for pack in cellPackDataList:
-            self.cellList.append((None, pack))
             foundCells = ModuleFinder.loadCellPack(pack)
             if len(foundCells) == 0:
                 continue
 
+            self.cellList.append((None, pack))
             self.cellListWidget.addItem(pack["package name"])
             for cellIndex in range(len(foundCells)):
                 self.cellListWidget.addItem("    " + foundCells[cellIndex][1]["cell name"])
