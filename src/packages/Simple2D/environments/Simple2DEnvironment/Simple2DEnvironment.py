@@ -18,15 +18,15 @@ class Simple2DEnvironment(Environment):
         self._stepCount += 1
 
     def _primaryClick(self, data):
-        self.addUserCell(data)
+        self._addUserCell(data)
 
     def _primaryDrag(self, originalData, newData):
-        self.addUserCell(newData)
+        self._addUserCell(newData)
 
     def _executorClearedCells(self):
         self._cellMap = {}
 
-    def addUserCell(self, data):
+    def _addUserCell(self, data):
         xCoordinate = data[0]
         yCoordinate = data[1]
 

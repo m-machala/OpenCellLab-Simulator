@@ -418,10 +418,6 @@ class MainScreen(QMainWindow):
 
         if "cell description" in module[1]:
             self.cellInfo.setText(module[1]["cell description"])
-
-        if "package type" in module[1]:
-            self.executor.selectCellBrainReference(None)
-        else:
             self.executor.selectCellBrainReference(module[0])
 
     def buildExportElement(self, exportFunction, isRenderer):
