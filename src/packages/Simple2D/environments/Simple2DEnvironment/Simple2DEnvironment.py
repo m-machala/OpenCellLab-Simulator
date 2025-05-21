@@ -40,12 +40,12 @@ class Simple2DEnvironment(Environment):
 
     
     def _secondaryClick(self, data):
-        self.userRemoveCell(data)
+        self._userRemoveCell(data)
 
     def _secondaryDrag(self, originalData, newData):
-        self.userRemoveCell(newData)        
+        self._userRemoveCell(newData)        
             
-    def userRemoveCell(self, data):
+    def _userRemoveCell(self, data):
         xCoordinate = data[0]
         yCoordinate = data[1]
 
