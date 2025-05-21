@@ -70,7 +70,8 @@ class GeneticCell(CellBrain):
             elif currentInstruction == 9:
                 self._environment.deleteCurrentCell()
             elif currentInstruction == 10:
-                self._environment.checkForCell(direction[0], direction[1])
+                if self._environment.checkForCell(direction[0], direction[1]):
+                    self.variable += 100
                 i += 1
             elif currentInstruction == 11:
                 if self.variable > 100:
