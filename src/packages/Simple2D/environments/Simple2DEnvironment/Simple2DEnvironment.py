@@ -37,13 +37,6 @@ class Simple2DEnvironment(Environment):
         newCellBrain = cellBrainReference(self)
 
         self._spawnCell(xCoordinate, yCoordinate, newCellBrain)
-
-    
-    def _secondaryClick(self, data):
-        self._userRemoveCell(data)
-
-    def _secondaryDrag(self, originalData, newData):
-        self._userRemoveCell(newData)        
             
     def _userRemoveCell(self, data):
         xCoordinate = data[0]
@@ -53,6 +46,12 @@ class Simple2DEnvironment(Environment):
             self._cellExecutor.removeCell(self._cellMap[(xCoordinate, yCoordinate)])
             
         self._updateCellMap(xCoordinate, yCoordinate)
+
+    def _secondaryClick(self, data):
+        self._userRemoveCell(data)
+
+    def _secondaryDrag(self, originalData, newData):
+        self._userRemoveCell(newData)        
     
     def _checkForCellAbsolute(self, xCoordinate, yCoordinate):
         if (xCoordinate, yCoordinate) in self._cellMap:
