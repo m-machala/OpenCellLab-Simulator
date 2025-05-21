@@ -80,4 +80,5 @@ class GeneticCell(CellBrain):
             elif currentInstruction == 12:
                 if self.variable > 0:
                     self._environment.giveEnergy(direction[0], direction[1], 1 / max(1, self.variable))
+                    i += 1
             i += 1
