@@ -29,10 +29,10 @@ class GeneticCell(CellBrain):
             third = len(self.genome) // 3
             for i in range(third):
                 newColor[0] += self.genome[i]
-                newColor[1] += self.genome[i * 2]
-                newColor[2] += self.genome[i * 3]
+                newColor[1] += self.genome[third + i]
+                newColor[2] += self.genome[2 * third + i]
 
-            self._environment.changeColor((newColor[0] // third % 256, newColor[1] // third % 256, newColor[2] // third % 256))
+            self._environment.changeColor(((int)(newColor[0] / (1000 * third) * 255), (int)(newColor[1] / (1000 * third) * 255), (int)(newColor[2] / (1000 * third) * 255)))
             self.colorSet = True
         i = 0
         while i < len(self.genome):
