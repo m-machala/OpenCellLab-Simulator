@@ -1,5 +1,6 @@
 tmp/
-src/packages/
+src/packages/*
+!src/packages/README.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
