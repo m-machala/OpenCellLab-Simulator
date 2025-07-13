@@ -1,6 +1,7 @@
-# OpenCellLab
+# OpenCellLab (OCL)
 Open and modular asynchronous cell automata simulator.
-This project is a part of my master's thesis.
+This project started as a part of my master's thesis.
+There are no functional modules included in this repository! To check or download example modules, go to: https://github.com/m-machala/OpenCellLab-Modules
 
 ## What is OCL?
 OCL is a cellular automata simulator written in Python 3, which is able to dynamically load user-created modules. 
@@ -8,12 +9,11 @@ OCL is a cellular automata simulator written in Python 3, which is able to dynam
 Its main focus is to make it easy to create, share and use modules, which can add new renderers, environments and cell types to the simulator.
 
 ## What do I need to run OCL?
-In its current iteration, OCL requires two to three things to run properly.
-To run the main application, all you need is python 3 and PyQt6 to be installed.
-To run the included renderer, you will also need the pillow library.
+All you need to run the simulator is for python 3 and for PyQt6 to be installed.
+Modules may need other libraries determined by their authors for you to be able to run them.
 
-## What kind of cellular automata does it simulate?
-The simulator has been created with asynchronous cellular automata in mind, meaning that each cell is executed individually, instead of executing all cells at the same time, like in other, more popular, CA.
+## What kind of cellular automata does OCL simulate?
+OCL has been created with asynchronous cellular automata in mind, meaning that each cell is executed individually, instead of executing all cells at the same time, like in other, more popular, CA.
 
 World topology, environmental behavior and cell behavior is determined by the combination of modules you choose. The simulator currently contains a simple 2D renderer, a simple 2D environment and a few cell types you can play around with, but you are free to try making your own!
 
@@ -44,4 +44,4 @@ Mandatory fields for the metadata files are:
   "cell class" - cell packs - name of the class of the current cell which you want to import into the simulation
   "cell name" - cell packs - name of the current cell which will be shown in the simulation
 
-For an example of implemented modules, look through the included packages /src/packages
+
