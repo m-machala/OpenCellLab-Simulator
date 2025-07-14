@@ -87,12 +87,7 @@ class WelcomeScreen(QMainWindow):
         self.reloadClicked()
 
     def populateModuleList(self):
-        if getattr(sys, "frozen", False):
-            path = os.path.dirname(sys.executable)
-        else:
-            path = os.path.dirname(os.path.abspath(__file__))
-        
-        path = os.path.join(path, "packages")
+        path = os.path.join(getFilePath(), "packages")
         #self.welcomeLabel.setText(path)
         packages = ModuleFinder.findPackageJSONs(path)
         self.moduleListItems = []
@@ -143,13 +138,8 @@ class WelcomeScreen(QMainWindow):
             return
         self.cellList.clear()
         self.selectedCells = []
-        
-        if getattr(sys, "frozen", False):
-            path = os.path.dirname(sys.executable)
-        else:
-            path = os.path.dirname(os.path.abspath(__file__))
 
-        modules = ModuleFinder.findPackageJSONs(os.path.join(path, "packages"))
+        modules = ModuleFinder.findPackageJSONs(os.path.join(getFilePath(), "packages"))
         cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
 
         for cellPack in cellPacks:
@@ -687,4 +677,10 @@ class SimulationLabel(QLabel):
         if self.middleDragging and event.button() == Qt.MouseButton.MiddleButton:
             self.middleDragging = False
 
+def getFilePath():
+    if getattr(sys, "frozen", False):
+        path = os.path.dirname(sys.executable)
+    else:
+        path = os.path.dirname(os.path.abspath(__file__))
 
+    return path
