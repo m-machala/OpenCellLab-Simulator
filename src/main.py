@@ -1,9 +1,13 @@
+import os
+
+if os.environ.get("XDG_SESSION_TYPE") == "wayland":
+    os.environ["QT_QPA_PLATFORM"] = "xcb"
+
 from UserInterface import WelcomeScreen
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSize
 import sys
-import os
 
 app = QApplication(sys.argv)
 app.setStyle("Fusion")
