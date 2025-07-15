@@ -2,7 +2,8 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
-    QButtonGroup, QSlider, QSpinBox, QSizePolicy
+    QButtonGroup, QSlider, QSpinBox, QSizePolicy,
+    QListWidgetItem
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent
@@ -97,13 +98,25 @@ class WelcomeScreen(QMainWindow):
         environments = ModuleFinder.filterJSONsByType(packages, "environment")
 
         for renderer in renderers:
-            self.moduleList.addItem(renderer["package name"])
+            if "package image path" in renderer and os.path.exists(renderer["package image path"]):
+                imagePath = renderer["package image path"]
+            else:
+                imagePath = os.path.join(getFilePath(), "icons", "missing.png")
+                
+            item = QListWidgetItem(QIcon(imagePath), renderer["package name"])
+            self.moduleList.addItem(item)
             self.moduleListItems.append(renderer)
             rendererClass = renderer["package class"]
 
             for environment in environments:
                 if rendererClass == environment["renderer class"]:
-                    self.moduleList.addItem("   " + environment["package name"])
+                    if "package image path" in environment and os.path.exists(environment["package image path"]):
+                        imagePath = environment["package image path"]
+                    else:
+                        imagePath = os.path.join(getFilePath(), "icons", "missing.png")
+                    
+                    item = QListWidgetItem(QIcon(imagePath), "   " + environment["package name"])
+                    self.moduleList.addItem(item)
                     self.moduleListItems.append(environment)
 
     def moduleSelectionChanged(self, item):
@@ -150,6 +163,9 @@ class WelcomeScreen(QMainWindow):
 
     def cellPackSelectionChanged(self, item):
         packIndex = self.cellList.row(item)
+        
+        if packIndex == -1:
+            return
 
         module = self.selectedCells[packIndex]
         if "package description" in module:

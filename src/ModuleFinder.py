@@ -38,6 +38,8 @@ def findPackageJSONs(folderPath):
             if validatePackageJSON(JSON):
                 directory = os.path.dirname(path)
                 JSON["package path"] = os.path.join(directory, JSON["package path"])
+                if "package image path" in JSON:
+                    JSON["package image path"] = os.path.join(directory, JSON["package image path"])
                 JSONs.append(JSON)
     return JSONs
 
