@@ -157,7 +157,13 @@ class WelcomeScreen(QMainWindow):
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
-                self.cellList.addItem(cellPack["package name"])
+                if "package image path" in cellPack and os.path.exists(cellPack["package image path"]):
+                    imagePath = cellPack["package image path"]
+                else:
+                    imagePath = os.path.join(getFilePath(), "icons", "missing.png")
+                
+                item = QListWidgetItem(QIcon(imagePath), cellPack["package name"])
+                self.cellList.addItem(item)
                 self.selectedCells.append(cellPack)
 
 
