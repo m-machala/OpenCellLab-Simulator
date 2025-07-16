@@ -113,10 +113,7 @@ class WelcomeScreen(QMainWindow):
         self.unselectCellPack()
         moduleIndex = self.moduleList.row(item)
         module = self.moduleListItems[moduleIndex]
-        if "package description" in module:
-            self.setModuleInfoText(module["package description"])
-        else:
-            self.setModuleInfoText("")
+        self.setModuleInfoText(moduleInfoBuilder(module))
 
         if module["package type"] == "environment":
             self.selectedEnvironment = module
@@ -159,10 +156,7 @@ class WelcomeScreen(QMainWindow):
             return
 
         module = self.selectedCells[packIndex]
-        if "package description" in module:
-            self.setModuleInfoText(module["package description"])
-        else:
-            self.setModuleInfoText("")
+        self.setModuleInfoText(moduleInfoBuilder(module))
 
 
     def setModuleInfoText(self, text):
@@ -413,11 +407,8 @@ class MainScreen(QMainWindow):
         cellIndex = self.cellListWidget.row(item)
         module = self.cellList[cellIndex]
 
-        if "package description" in module[1]:
-            self.cellInfo.setText(module[1]["package description"])
-
+        self.cellInfo.setText(moduleInfoBuilder(module[1]))
         if "cell description" in module[1]:
-            self.cellInfo.setText(module[1]["cell description"])
             self.executor.selectCellBrainReference(module[0])
 
     def buildExportElement(self, exportFunction, isRenderer):
@@ -714,3 +705,31 @@ def listItemBuilder(metadata, spaceWidth = 0, bold = False):
     item.setFont(font)
 
     return item
+
+def moduleInfoBuilder(metadata):
+    infoText = "<b>"
+    if "package name" in metadata:
+        infoText += metadata['package name']
+    elif "cell name" in metadata:
+        infoText += metadata['cell name']
+    else:
+        infoText += "Name missing"
+    infoText += "</b><br>"
+
+    if "author name" in metadata:
+        infoText += "by: "
+        infoText += metadata["author name"]
+        infoText += "<br>"
+
+    infoText += "<br>"
+
+    if "package description" in metadata:
+        infoText += metadata["package description"]
+    elif "cell description" in metadata:
+        infoText += metadata["cell description"]
+
+    return infoText
+
+
+
+    
