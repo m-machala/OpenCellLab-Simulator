@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QListWidgetItem
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
-from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent
+from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent, QFont
 import ModuleFinder
 import os
 import sys
@@ -97,25 +97,15 @@ class WelcomeScreen(QMainWindow):
         renderers = ModuleFinder.filterJSONsByType(packages, "renderer")
         environments = ModuleFinder.filterJSONsByType(packages, "environment")
 
-        for renderer in renderers:
-            if "package image path" in renderer and os.path.exists(renderer["package image path"]):
-                imagePath = renderer["package image path"]
-            else:
-                imagePath = os.path.join(getFilePath(), "icons", "missing.png")
-                
-            item = QListWidgetItem(QIcon(imagePath), renderer["package name"])
+        for renderer in renderers:                
+            item = listItemBuilder(renderer, bold = True)
             self.moduleList.addItem(item)
             self.moduleListItems.append(renderer)
             rendererClass = renderer["package class"]
 
             for environment in environments:
-                if rendererClass == environment["renderer class"]:
-                    if "package image path" in environment and os.path.exists(environment["package image path"]):
-                        imagePath = environment["package image path"]
-                    else:
-                        imagePath = os.path.join(getFilePath(), "icons", "missing.png")
-                    
-                    item = QListWidgetItem(QIcon(imagePath), "   " + environment["package name"])
+                if rendererClass == environment["renderer class"]:                  
+                    item = listItemBuilder(environment, 3)
                     self.moduleList.addItem(item)
                     self.moduleListItems.append(environment)
 
@@ -157,12 +147,7 @@ class WelcomeScreen(QMainWindow):
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
-                if "package image path" in cellPack and os.path.exists(cellPack["package image path"]):
-                    imagePath = cellPack["package image path"]
-                else:
-                    imagePath = os.path.join(getFilePath(), "icons", "missing.png")
-                
-                item = QListWidgetItem(QIcon(imagePath), cellPack["package name"])
+                item = listItemBuilder(cellPack)
                 self.cellList.addItem(item)
                 self.selectedCells.append(cellPack)
 
@@ -395,10 +380,13 @@ class MainScreen(QMainWindow):
             if len(foundCells) == 0:
                 continue
 
-            self.cellList.append((None, pack))
-            self.cellListWidget.addItem(pack["package name"])
+            self.cellList.append((None, pack))    
+            item = listItemBuilder(pack, bold = True)
+            self.cellListWidget.addItem(item)
+
             for cellIndex in range(len(foundCells)):
-                self.cellListWidget.addItem("    " + foundCells[cellIndex][1]["cell name"])
+                item = listItemBuilder(foundCells[cellIndex][1], 3)
+                self.cellListWidget.addItem(item)
                 self.cellList.append(foundCells[cellIndex])
 
         # load export functions
@@ -706,3 +694,23 @@ def getFilePath():
         path = os.path.dirname(os.path.abspath(__file__))
 
     return path
+
+def listItemBuilder(metadata, spaceWidth = 0, bold = False):
+    if "package image path" in metadata and os.path.exists(metadata["package image path"]):
+        imagePath = metadata["package image path"]
+    elif "cell image path" in metadata and os.path.exists(metadata["cell image path"]):
+        imagePath = metadata["cell image path"]
+    else:
+        imagePath = os.path.join(getFilePath(), "icons", "missing.png")
+
+    if "package name" in metadata:
+        text = metadata["package name"]
+    elif "cell name" in metadata:
+        text = metadata["cell name"]
+
+    item = QListWidgetItem(QIcon(imagePath), " " * spaceWidth + text)
+    font = QFont()
+    font.setBold(bold)
+    item.setFont(font)
+
+    return item

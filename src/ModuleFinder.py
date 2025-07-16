@@ -40,6 +40,10 @@ def findPackageJSONs(folderPath):
                 JSON["package path"] = os.path.join(directory, JSON["package path"])
                 if "package image path" in JSON:
                     JSON["package image path"] = os.path.join(directory, JSON["package image path"])
+                if "cell types" in JSON:
+                    for cellType in JSON["cell types"]:
+                        if "cell image path" in cellType:
+                            cellType["cell image path"] = os.path.join(directory, cellType["cell image path"])
                 JSONs.append(JSON)
     return JSONs
 
