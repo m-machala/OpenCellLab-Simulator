@@ -202,7 +202,7 @@ class MainScreen(QMainWindow):
         # toolbar
 
         toolbar = QToolBar()
-        toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         self.addToolBar(toolbar)
 
         iconPath = os.path.join(getFilePath(), "icons")
