@@ -202,22 +202,25 @@ class MainScreen(QMainWindow):
         # toolbar
 
         toolbar = QToolBar()
+        toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.addToolBar(toolbar)
 
-        playAction = QAction(QIcon(), "Play", self)
+        iconPath = os.path.join(getFilePath(), "icons")
+
+        playAction = QAction(QIcon(os.path.join(iconPath, "play.png")), "Play", self)
         toolbar.addAction(playAction)
         playAction.triggered.connect(self.simulationTimer.start)
 
-        pauseAction = QAction(QIcon(), "Pause", self)
+        pauseAction = QAction(QIcon(os.path.join(iconPath, "pause.png")), "Pause", self)
         toolbar.addAction(pauseAction)
         pauseAction.triggered.connect(self.simulationTimer.stop)
         pauseAction.triggered.connect(self.updateSimulationView)
 
-        self.stepAction = QAction(QIcon(), "Step", self)
+        self.stepAction = QAction(QIcon(os.path.join(iconPath, "step.png")), "Step", self)
         toolbar.addAction(self.stepAction)
         self.stepAction.triggered.connect(self.stepClicked)
 
-        self.clearAction = QAction(QIcon(), "Clear", self)
+        self.clearAction = QAction(QIcon(os.path.join(iconPath, "clear.png")), "Clear", self)
         toolbar.addAction(self.clearAction)
         self.clearAction.triggered.connect(self.clearClicked)
 
@@ -226,13 +229,13 @@ class MainScreen(QMainWindow):
         mouseModeGroup = QActionGroup(self)
         mouseModeGroup.setExclusive(True)
 
-        self.clickModeAction = QAction(QIcon(), "Click", self)
+        self.clickModeAction = QAction(QIcon(os.path.join(iconPath, "click.png")), "Click", self)
         self.clickModeAction.setCheckable(True)
         self.clickModeAction.setChecked(True)
         mouseModeGroup.addAction(self.clickModeAction)
         toolbar.addAction(self.clickModeAction)
 
-        self.dragModeAction = QAction(QIcon(), "Drag", self)
+        self.dragModeAction = QAction(QIcon(os.path.join(iconPath, "drag.png")), "Drag", self)
         self.dragModeAction.setCheckable(True)
         mouseModeGroup.addAction(self.dragModeAction)
         toolbar.addAction(self.dragModeAction)
@@ -242,13 +245,13 @@ class MainScreen(QMainWindow):
         interactionModeGroup = QActionGroup(self)
         interactionModeGroup.setExclusive(True)
 
-        self.environmentModeAction = QAction(QIcon(), "Environment", self)
+        self.environmentModeAction = QAction(QIcon(os.path.join(iconPath, "environment.png")), "Environment", self)
         self.environmentModeAction.setCheckable(True)
         self.environmentModeAction.setChecked(True)
         interactionModeGroup.addAction(self.environmentModeAction)
         toolbar.addAction(self.environmentModeAction)
 
-        self.rendererModeAction = QAction(QIcon(), "Renderer", self)
+        self.rendererModeAction = QAction(QIcon(os.path.join(iconPath, "renderer.png")), "Renderer", self)
         self.rendererModeAction.setCheckable(True)
         interactionModeGroup.addAction(self.rendererModeAction)
         toolbar.addAction(self.rendererModeAction)
