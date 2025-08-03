@@ -66,3 +66,19 @@ class Environment(ABC):
     # originalData represents the interaction data from the initial press, newData represents the current data
     def _tertiaryDrag(self, originalData, newData):
         pass
+
+    # Called every time a key on the keyboard has been pressed
+    # Ignores the shift key due to its use in the interface
+    def _keyPressed(self, keyName):
+        pass
+
+    # Called every time a key on the keyboard is being held
+    # Ignores the shift key due to its use in the interface
+    def _keyHeld(self, keyName):
+        pass
+
+    # Called every time a key on the keyboard has been released
+    # Ignores the shift key due to its use in the interface
+    def _keyReleased(self, keyName):
+        pass
+    

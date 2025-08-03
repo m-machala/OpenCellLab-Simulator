@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QListWidgetItem
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
-from PyQt6.QtGui import QAction, QActionGroup, QIcon, QPixmap, QImage, QMouseEvent, QFont
+from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeyEvent, QPixmap, QImage, QMouseEvent, QFont
 import ModuleFinder
 import os
 import sys
@@ -191,6 +191,8 @@ class MainScreen(QMainWindow):
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
         mainLayout = QHBoxLayout(centralWidget)
+
+        self.pressedKeys = set()
 
         # timers
 
@@ -525,17 +527,23 @@ class MainScreen(QMainWindow):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
     def determineReceiver(self):
-        if self.environmentModeAction.isChecked():
+        environmentCheck = self.environmentModeAction.isChecked()
+        rendererCheck = self.rendererModeAction.isChecked()
+        shiftPressed = "Shift" in self.pressedKeys
+
+        if (environmentCheck and not shiftPressed) or (rendererCheck and shiftPressed):
             return self.environment
-        elif self.rendererModeAction.isChecked():
+        elif (rendererCheck and not shiftPressed) or (environmentCheck and shiftPressed):
             return self.renderer
         else:
             return None
         
     def processCoordinates(self, x, y):
-        if self.environmentModeAction.isChecked():
+        receiver = self.determineReceiver()
+
+        if receiver == self.environment:
             return self.renderer.convertFromImageCoordinates(x, y)
-        elif self.rendererModeAction.isChecked():
+        elif receiver == self.renderer:
             return (x, y)
 
     def imageLeftClicked(self, x, y):
@@ -611,6 +619,37 @@ class MainScreen(QMainWindow):
         self.renderer._setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.updateSimulationView()
 
+    def keyPressEvent(self, event: QKeyEvent):
+        pressedKey = event.key()
+        keyName = Qt.Key(pressedKey).name[4:]
+        receiver = self.determineReceiver()
+        if not receiver:
+            return
+
+        if keyName not in self.pressedKeys:
+            self.pressedKeys.add(keyName)
+
+            if keyName != "Shift":
+                receiver._keyPressed(keyName)
+            else:
+                self.simulationImageLabel.receiverChanged()
+        else:
+            if keyName != "Shift":
+                receiver._keyHeld(keyName)
+            else:
+                self.simulationImageLabel.receiverChanged()
+
+    def keyReleaseEvent(self, event: QKeyEvent):
+        releasedKey = event.key()
+        keyName = Qt.Key(releasedKey).name[4:]
+        receiver = self.determineReceiver()
+        if not receiver:
+            return
+
+        if keyName in self.pressedKeys:
+            self.pressedKeys.remove(keyName)
+            receiver._keyReleased(keyName)
+
 
 class SimulationLabel(QLabel):
     leftClicked = pyqtSignal(int, int)
@@ -680,6 +719,12 @@ class SimulationLabel(QLabel):
 
         if self.middleDragging and event.button() == Qt.MouseButton.MiddleButton:
             self.middleDragging = False
+
+    def receiverChanged(self):
+        self.leftDragging = False
+        self.middleDragging = False
+        self.rightDragging = False
+                
 
 def getFilePath():
     if getattr(sys, "frozen", False):
