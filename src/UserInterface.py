@@ -633,13 +633,20 @@ class MainScreen(QMainWindow):
                 receiver._keyPressed(keyName)
             else:
                 self.simulationImageLabel.receiverChanged()
+                return
         else:
             if keyName != "Shift":
                 receiver._keyHeld(keyName)
             else:
                 self.simulationImageLabel.receiverChanged()
+                return
+
+        self.updateSimulationView()
 
     def keyReleaseEvent(self, event: QKeyEvent):
+        if event.isAutoRepeat():
+            return
+        
         releasedKey = event.key()
         keyName = Qt.Key(releasedKey).name[4:]
         receiver = self.determineReceiver()
@@ -649,6 +656,8 @@ class MainScreen(QMainWindow):
         if keyName in self.pressedKeys:
             self.pressedKeys.remove(keyName)
             receiver._keyReleased(keyName)
+
+        self.updateSimulationView()
 
 
 class SimulationLabel(QLabel):
@@ -724,7 +733,7 @@ class SimulationLabel(QLabel):
         self.leftDragging = False
         self.middleDragging = False
         self.rightDragging = False
-                
+
 
 def getFilePath():
     if getattr(sys, "frozen", False):
