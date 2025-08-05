@@ -250,6 +250,7 @@ class MainScreen(QMainWindow):
         self.environmentModeAction = QAction(QIcon(os.path.join(iconPath, "environment.png")), "Environment", self)
         self.environmentModeAction.setCheckable(True)
         self.environmentModeAction.setChecked(True)
+        self.environmentModeAction.toggled.connect(self.receiverChanged)
         interactionModeGroup.addAction(self.environmentModeAction)
         toolbar.addAction(self.environmentModeAction)
 
@@ -526,15 +527,19 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
-    def determineReceiver(self):
+    def determineReceiver(self, switch = False):
         environmentCheck = self.environmentModeAction.isChecked()
         rendererCheck = self.rendererModeAction.isChecked()
         shiftPressed = "Shift" in self.pressedKeys
 
         if (environmentCheck and not shiftPressed) or (rendererCheck and shiftPressed):
-            return self.environment
-        elif (rendererCheck and not shiftPressed) or (environmentCheck and shiftPressed):
+            if not switch:
+                return self.environment
             return self.renderer
+        elif (rendererCheck and not shiftPressed) or (environmentCheck and shiftPressed):
+            if not switch:
+                return self.renderer
+            return self.environment
         else:
             return None
         
@@ -617,6 +622,8 @@ class MainScreen(QMainWindow):
     def showEvent(self, event):
         super().showEvent(event)
         self.renderer._setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
         self.updateSimulationView()
 
     def keyPressEvent(self, event: QKeyEvent):
@@ -632,14 +639,11 @@ class MainScreen(QMainWindow):
             if keyName != "Shift":
                 receiver._keyPressed(keyName)
             else:
-                self.simulationImageLabel.receiverChanged()
-                return
+                self.receiverChanged()
+                self.pressedKeys.add("Shift")
         else:
             if keyName != "Shift":
                 receiver._keyHeld(keyName)
-            else:
-                self.simulationImageLabel.receiverChanged()
-                return
 
         self.updateSimulationView()
 
@@ -655,9 +659,24 @@ class MainScreen(QMainWindow):
 
         if keyName in self.pressedKeys:
             self.pressedKeys.remove(keyName)
-            receiver._keyReleased(keyName)
+
+            if keyName != "Shift":
+                receiver._keyReleased(keyName)
+            else:
+                self.receiverChanged()
 
         self.updateSimulationView()
+
+    def releaseAllKeys(self, receiver):
+        for keyName in self.pressedKeys:
+            receiver._keyReleased(keyName)
+        
+        self.pressedKeys.clear()
+
+    def receiverChanged(self):
+        oldReceiver = self.determineReceiver(True)
+        self.releaseAllKeys(oldReceiver)
+        self.simulationImageLabel.receiverChanged()
 
 
 class SimulationLabel(QLabel):
