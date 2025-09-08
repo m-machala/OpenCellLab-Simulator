@@ -201,6 +201,10 @@ class MainScreen(QMainWindow):
         self.simulationTimer.timeout.connect(self.simulationTimerTriggered)
         self.simulationTimer.stop()
 
+        self.inputTimer = QTimer()
+        self.inputTimer.setInterval(16)
+        self.inputTimer.timeout.connect(self.keyRepeat)
+
         # toolbar
 
         toolbar = QToolBar()
@@ -634,14 +638,23 @@ class MainScreen(QMainWindow):
             return
 
         if keyName not in self.pressedKeys:
-            self.pressedKeys.add(keyName)
+            if len(self.pressedKeys) == 0:
+                self.inputTimer.start()
 
+            self.pressedKeys.add(keyName)
             if keyName != "Shift":
                 receiver._keyPressed(keyName)
             else:
                 self.receiverChanged()
-                self.pressedKeys.add("Shift")
-        else:
+
+        self.updateSimulationView()
+
+    def keyRepeat(self):
+        receiver = self.determineReceiver()
+        if not receiver:
+            return
+
+        for keyName in self.pressedKeys:
             if keyName != "Shift":
                 receiver._keyHeld(keyName)
 
@@ -664,6 +677,9 @@ class MainScreen(QMainWindow):
                 receiver._keyReleased(keyName)
             else:
                 self.receiverChanged()
+
+        if len(self.pressedKeys) == 0:
+            self.inputTimer.stop()
 
         self.updateSimulationView()
 
