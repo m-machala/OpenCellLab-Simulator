@@ -480,8 +480,7 @@ class MainScreen(QMainWindow):
             slider.valueChanged.connect(exportFunction.functionReference)
             outputLayout.addWidget(slider)
 
-            if isRenderer:
-                slider.valueChanged.connect(self.updateSimulationView)
+            slider.valueChanged.connect(self.updateSimulationView)
             
         elif controlElement == ControlElement.SPINBOX:
             outputElement = QWidget()
@@ -501,7 +500,7 @@ class MainScreen(QMainWindow):
             if isRenderer:
                 spinbox.valueChanged.connect(self.updateSimulationView)
 
-        if isRenderer and outputElement != None:
+        if outputElement != None:
             if not (controlElement == ControlElement.SLIDER or controlElement == ControlElement.SPINBOX):
                 if controlElement == ControlElement.REPEATINGBUTTON:
                     self.exportTimers[-1].timeout.connect(self.updateSimulationView)
