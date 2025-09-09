@@ -645,6 +645,7 @@ class MainScreen(QMainWindow):
                 receiver._keyPressed(keyName)
             else:
                 self.receiverChanged()
+                self.pressedKeys.add(keyName)
 
         self.updateSimulationView()
 
@@ -684,7 +685,8 @@ class MainScreen(QMainWindow):
 
     def releaseAllKeys(self, receiver):
         for keyName in self.pressedKeys:
-            receiver._keyReleased(keyName)
+            if keyName != "Shift":
+                receiver._keyReleased(keyName)
         
         self.pressedKeys.clear()
 
