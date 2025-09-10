@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
     QButtonGroup, QSlider, QSpinBox, QSizePolicy,
-    QListWidgetItem
+    QListWidgetItem, QSpacerItem
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeyEvent, QPixmap, QImage, QMouseEvent, QFont
@@ -474,8 +474,20 @@ class MainScreen(QMainWindow):
             minimumValue = exportFunction.additionalArguments[0]
             maximumValue = exportFunction.additionalArguments[1]
 
-            label = QLabel("<b>" + exportFunction.name + "</b><br>[" + str(minimumValue) + " - " + str(maximumValue) + "]")
+            label = QLabel("<b>" + exportFunction.name + "</b>")
             outputLayout.addWidget(label)
+
+            rangeLayout = QHBoxLayout()
+            outputLayout.addLayout(rangeLayout)
+            
+            lowerValueLabel = QLabel(str(minimumValue))
+            rangeLayout.addWidget(lowerValueLabel)
+
+            rangeLayout.addStretch()
+
+            upperValueLabel = QLabel(str(maximumValue))
+            rangeLayout.addWidget(upperValueLabel)
+
 
             slider = QSlider(Qt.Orientation.Horizontal)
             slider.setMinimum(minimumValue)
@@ -485,7 +497,7 @@ class MainScreen(QMainWindow):
 
             valueLabel = QLabel(str(slider.value()))
             setValue = lambda value : valueLabel.setText(str(value))
-            outputLayout.addWidget(valueLabel)
+            outputLayout.addWidget(valueLabel, alignment=Qt.AlignmentFlag.AlignHCenter)
 
             slider.valueChanged.connect(setValue)
             slider.valueChanged.connect(exportFunction.functionReference)
