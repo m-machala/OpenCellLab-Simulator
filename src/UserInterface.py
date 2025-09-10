@@ -471,15 +471,24 @@ class MainScreen(QMainWindow):
             outputLayout = QVBoxLayout()
             outputElement.setLayout(outputLayout)
 
-            label = QLabel(exportFunction.name)
+            minimumValue = exportFunction.additionalArguments[0]
+            maximumValue = exportFunction.additionalArguments[1]
+
+            label = QLabel(exportFunction.name + "\n[" + str(minimumValue) + " - " + str(maximumValue) + "]")
             outputLayout.addWidget(label)
+
             slider = QSlider(Qt.Orientation.Horizontal)
-            slider.setMinimum(exportFunction.additionalArguments[0])
-            slider.setMaximum(exportFunction.additionalArguments[1])
+            slider.setMinimum(minimumValue)
+            slider.setMaximum(maximumValue)
             slider.setValue(exportFunction.additionalArguments[2])
-            slider.valueChanged.connect(exportFunction.functionReference)
             outputLayout.addWidget(slider)
 
+            valueLabel = QLabel(str(slider.value()))
+            setValue = lambda value : valueLabel.setText(str(value))
+            outputLayout.addWidget(valueLabel)
+
+            slider.valueChanged.connect(setValue)
+            slider.valueChanged.connect(exportFunction.functionReference)
             slider.valueChanged.connect(self.updateSimulationView)
             
         elif controlElement == ControlElement.SPINBOX:
