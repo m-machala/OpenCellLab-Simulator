@@ -423,7 +423,7 @@ class MainScreen(QMainWindow):
 
     def buildExportElement(self, exportFunction, isRenderer):
         if isinstance(exportFunction, str):
-            label = QLabel(exportFunction)
+            label = QLabel("<b>" + exportFunction + "</b>")
             return label
         
         controlElement = exportFunction.controlElement
@@ -474,7 +474,7 @@ class MainScreen(QMainWindow):
             minimumValue = exportFunction.additionalArguments[0]
             maximumValue = exportFunction.additionalArguments[1]
 
-            label = QLabel(exportFunction.name + "\n[" + str(minimumValue) + " - " + str(maximumValue) + "]")
+            label = QLabel("<b>" + exportFunction.name + "</b><br>[" + str(minimumValue) + " - " + str(maximumValue) + "]")
             outputLayout.addWidget(label)
 
             slider = QSlider(Qt.Orientation.Horizontal)
@@ -497,7 +497,7 @@ class MainScreen(QMainWindow):
             outputLayout = QVBoxLayout()
             outputElement.setLayout(outputLayout)
 
-            label = QLabel(exportFunction.name)
+            label = QLabel("<b>" + exportFunction.name + "</b>")
             outputLayout.addWidget(label)
             spinbox = QSpinBox()
             spinbox.setMinimum(exportFunction.additionalArguments[0])
