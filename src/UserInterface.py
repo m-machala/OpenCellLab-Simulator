@@ -226,6 +226,25 @@ class MainScreen(QMainWindow):
         toolbar.addAction(self.stepAction)
         self.stepAction.triggered.connect(self.stepClicked)
 
+        stepContainer = QWidget()
+        stepLayout = QVBoxLayout()
+        stepLayout.setContentsMargins(0, 0, 0, 0)
+        stepLayout.setSpacing(0)
+        stepContainer.setLayout(stepLayout)
+
+        stepLabel = QLabel("Steps:")
+        stepLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        stepLayout.addWidget(stepLabel)
+
+        self.stepSizeSpinBox = QSpinBox()
+        self.stepSizeSpinBox.setMinimum(1)
+        self.stepSizeSpinBox.setMaximum(1000)
+        self.stepSizeSpinBox.setValue(1)
+        self.stepSizeSpinBox.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        stepLayout.addWidget(self.stepSizeSpinBox)
+
+        toolbar.addWidget(stepContainer)
+
         self.clearAction = QAction(QIcon(os.path.join(iconPath, "clear.png")), "Clear", self)
         toolbar.addAction(self.clearAction)
         self.clearAction.triggered.connect(self.clearClicked)
@@ -531,7 +550,9 @@ class MainScreen(QMainWindow):
         return outputElement
     
     def simulationTimerTriggered(self):
-        self.executor._cycleCells()
+        steps = self.stepSizeSpinBox.value()
+        for _ in range(steps):
+            self.executor._cycleCells()
         self.updateSimulationView()
 
     def stepClicked(self):
@@ -843,7 +864,3 @@ def moduleInfoBuilder(metadata):
         infoText += metadata["cell description"]
 
     return infoText
-
-
-
-    
