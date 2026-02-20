@@ -683,11 +683,22 @@ class MainScreen(QMainWindow):
                 self.inputTimer.start()
 
             self.pressedKeys.add(keyName)
-            if keyName != "Shift":
-                receiver._keyPressed(keyName)
-            else:
+            if keyName == "Shift":
                 self.receiverChanged()
                 self.pressedKeys.add(keyName)
+            elif keyName == "F":
+                if self.clickModeAction.isChecked():
+                    self.dragModeAction.setChecked(True)
+                else:
+                    self.clickModeAction.setChecked(True)
+            elif keyName == "R":
+                if self.environmentModeAction.isChecked():
+                    self.rendererModeAction.setChecked(True)
+                else:
+                    self.environmentModeAction.setChecked(True)
+            else:
+                receiver._keyPressed(keyName)
+                
 
         self.updateSimulationView()
 
@@ -715,10 +726,10 @@ class MainScreen(QMainWindow):
         if keyName in self.pressedKeys:
             self.pressedKeys.remove(keyName)
 
-            if keyName != "Shift":
-                receiver._keyReleased(keyName)
-            else:
+            if keyName == "Shift":
                 self.receiverChanged()
+            else:
+                receiver._keyReleased(keyName)
 
         if len(self.pressedKeys) == 0:
             self.inputTimer.stop()
