@@ -685,7 +685,6 @@ class MainScreen(QMainWindow):
             self.pressedKeys.add(keyName)
             if keyName == "Shift":
                 self.receiverChanged()
-                self.pressedKeys.add(keyName)
             elif keyName == "F":
                 if self.clickModeAction.isChecked():
                     self.dragModeAction.setChecked(True)
@@ -737,11 +736,15 @@ class MainScreen(QMainWindow):
         self.updateSimulationView()
 
     def releaseAllKeys(self, receiver):
+        keepShift = "Shift" in self.pressedKeys
         for keyName in self.pressedKeys:
             if keyName != "Shift":
                 receiver._keyReleased(keyName)
         
-        self.pressedKeys.clear()
+        if keepShift:
+            self.pressedKeys.add("Shift")
+        
+
 
     def receiverChanged(self):
         oldReceiver = self.determineReceiver(True)
