@@ -741,6 +741,8 @@ class MainScreen(QMainWindow):
             if keyName != "Shift":
                 receiver._keyReleased(keyName)
         
+        self.pressedKeys.clear()
+
         if keepShift:
             self.pressedKeys.add("Shift")
         
