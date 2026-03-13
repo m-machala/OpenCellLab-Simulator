@@ -42,3 +42,6 @@ class CellExecutor:
         self.currentCell = None
         self.cellList.clear()
         self._environment._executorClearedCells()
+
+    def getCellCount(self):
+        return(len(self.cellList))

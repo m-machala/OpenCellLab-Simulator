@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
     QButtonGroup, QSlider, QSpinBox, QSizePolicy,
-    QListWidgetItem, QSpacerItem
+    QListWidgetItem, QSpacerItem, QStatusBar
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeyEvent, QPixmap, QImage, QMouseEvent, QFont
@@ -283,6 +283,12 @@ class MainScreen(QMainWindow):
         toolbar.addAction(self.rendererModeAction)
 
 
+        # status bar
+
+        self.cellCountLabel = QLabel()
+        self.statusBar().addPermanentWidget(self.cellCountLabel)
+
+
         # simulation and cell selection        
 
         simucellLayout = QVBoxLayout()
@@ -428,6 +434,9 @@ class MainScreen(QMainWindow):
             element = self.buildExportElement(exportFunction, False)
             self.environmentExportsInnerLayout.addWidget(element)
         self.environmentExportsInnerLayout.addStretch(1)
+
+        # get cell count
+        self.updateCellCounter()
         
     def loadingFailed(self):
         print("Loading error")
@@ -520,7 +529,7 @@ class MainScreen(QMainWindow):
 
             slider.valueChanged.connect(setValue)
             slider.valueChanged.connect(exportFunction.functionReference)
-            slider.valueChanged.connect(self.updateSimulationView)
+            slider.valueChanged.connect(self.possibleCellUpdate)
             
         elif controlElement == ControlElement.SPINBOX:
             outputElement = QWidget()
@@ -538,14 +547,14 @@ class MainScreen(QMainWindow):
             outputLayout.addWidget(spinbox)
 
             if isRenderer:
-                spinbox.valueChanged.connect(self.updateSimulationView)
+                spinbox.valueChanged.connect(self.possibleCellUpdate)
 
         if outputElement != None:
             if not (controlElement == ControlElement.SLIDER or controlElement == ControlElement.SPINBOX):
                 if controlElement == ControlElement.REPEATINGBUTTON:
-                    self.exportTimers[-1].timeout.connect(self.updateSimulationView)
+                    self.exportTimers[-1].timeout.connect(self.possibleCellUpdate)
                 else:
-                    outputElement.clicked.connect(self.updateSimulationView) # type: ignore
+                    outputElement.clicked.connect(self.possibleCellUpdate) # type: ignore
 
         return outputElement
     
@@ -553,6 +562,17 @@ class MainScreen(QMainWindow):
         steps = self.stepSizeSpinBox.value()
         for _ in range(steps):
             self.executor._cycleCells()
+        self.possibleCellUpdate()
+
+    def updateCellCounter(self):
+        cellCount = self.executor.getCellCount()
+        self.cellCountLabel.setText("Cell count: " + str(cellCount))
+    
+    def updateSimulationView(self):
+        self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
+
+    def possibleCellUpdate(self):
+        self.updateCellCounter()
         self.updateSimulationView()
 
     def stepClicked(self):
@@ -562,15 +582,12 @@ class MainScreen(QMainWindow):
     def clearClicked(self):
         self.simulationTimer.stop()
         self.executor.clearCells()
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.renderer._setOutputResolution(self.simulationImageLabel.width(), self.simulationImageLabel.height())
         self.updateSimulationView()
-
-    def updateSimulationView(self):
-        self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
     def determineReceiver(self, switch = False):
         environmentCheck = self.environmentModeAction.isChecked()
@@ -605,7 +622,7 @@ class MainScreen(QMainWindow):
         self.originalLeft = processedCoordinates
         if self.clickModeAction.isChecked():
             receiver._primaryClick(processedCoordinates)
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def imageRightClicked(self, x, y):
         receiver = self.determineReceiver()
@@ -616,7 +633,7 @@ class MainScreen(QMainWindow):
         self.originalRight = processedCoordinates
         if self.clickModeAction.isChecked():
             receiver._secondaryClick(processedCoordinates)
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def imageMiddleClicked(self, x, y):
         receiver = self.determineReceiver()
@@ -627,8 +644,7 @@ class MainScreen(QMainWindow):
         self.originalMiddle = processedCoordinates
         if self.clickModeAction.isChecked():
             receiver._tertiaryClick(processedCoordinates)
-        self.updateSimulationView()
-
+        self.possibleCellUpdate()
 
     def imageLeftDragged(self, x, y):
         if not self.dragModeAction.isChecked(): return
@@ -639,7 +655,7 @@ class MainScreen(QMainWindow):
         
         receiver._primaryDrag(self.originalLeft, processedCoordinates)
         self.originalLeft = processedCoordinates
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def imageRightDragged(self, x, y):
         if not self.dragModeAction.isChecked(): return
@@ -650,7 +666,7 @@ class MainScreen(QMainWindow):
         
         receiver._secondaryDrag(self.originalRight, processedCoordinates)
         self.originalRight = processedCoordinates
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def imageMiddleDragged(self, x, y):
         if not self.dragModeAction.isChecked(): return
@@ -661,7 +677,7 @@ class MainScreen(QMainWindow):
         
         receiver._tertiaryDrag(self.originalMiddle, processedCoordinates)
         self.originalMiddle = processedCoordinates
-        self.updateSimulationView()
+        self.possibleCellUpdate()
         
 
     def showEvent(self, event):
@@ -699,7 +715,7 @@ class MainScreen(QMainWindow):
                 receiver._keyPressed(keyName)
                 
 
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def keyRepeat(self):
         receiver = self.determineReceiver()
@@ -710,7 +726,7 @@ class MainScreen(QMainWindow):
             if keyName != "Shift":
                 receiver._keyHeld(keyName)
 
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def keyReleaseEvent(self, event: QKeyEvent):
         if event.isAutoRepeat():
@@ -733,7 +749,7 @@ class MainScreen(QMainWindow):
         if len(self.pressedKeys) == 0:
             self.inputTimer.stop()
 
-        self.updateSimulationView()
+        self.possibleCellUpdate()
 
     def releaseAllKeys(self, receiver):
         keepShift = "Shift" in self.pressedKeys
@@ -745,8 +761,6 @@ class MainScreen(QMainWindow):
 
         if keepShift:
             self.pressedKeys.add("Shift")
-        
-
 
     def receiverChanged(self):
         oldReceiver = self.determineReceiver(True)
