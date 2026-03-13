@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
     QButtonGroup, QSlider, QSpinBox, QSizePolicy,
-    QListWidgetItem, QSpacerItem, QStatusBar
+    QListWidgetItem, QSpacerItem, QStatusBar, QFrame
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeyEvent, QPixmap, QImage, QMouseEvent, QFont
@@ -193,6 +193,7 @@ class MainScreen(QMainWindow):
         mainLayout = QHBoxLayout(centralWidget)
 
         self.pressedKeys = set()
+        self.stepCount = 0
 
         # timers
 
@@ -215,11 +216,11 @@ class MainScreen(QMainWindow):
 
         playAction = QAction(QIcon(os.path.join(iconPath, "play.png")), "Play", self)
         toolbar.addAction(playAction)
-        playAction.triggered.connect(self.simulationTimer.start)
+        playAction.triggered.connect(self.startSimulation)
 
         pauseAction = QAction(QIcon(os.path.join(iconPath, "pause.png")), "Pause", self)
         toolbar.addAction(pauseAction)
-        pauseAction.triggered.connect(self.simulationTimer.stop)
+        pauseAction.triggered.connect(self.pauseSimulation)
         pauseAction.triggered.connect(self.updateSimulationView)
 
         self.stepAction = QAction(QIcon(os.path.join(iconPath, "step.png")), "Step", self)
@@ -285,8 +286,20 @@ class MainScreen(QMainWindow):
 
         # status bar
 
+        bar = self.statusBar()
+
+        self.simulationStatusLabel = QLabel()
+        bar.addWidget(self.simulationStatusLabel)
+        
+        self.stepCountLabel = QLabel()
+        bar.addPermanentWidget(self.stepCountLabel)
+
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.VLine)
+        bar.addPermanentWidget(separator)
+
         self.cellCountLabel = QLabel()
-        self.statusBar().addPermanentWidget(self.cellCountLabel)
+        bar.addPermanentWidget(self.cellCountLabel)
 
 
         # simulation and cell selection        
@@ -435,8 +448,8 @@ class MainScreen(QMainWindow):
             self.environmentExportsInnerLayout.addWidget(element)
         self.environmentExportsInnerLayout.addStretch(1)
 
-        # get cell count
-        self.updateCellCounter()
+        self.possibleCellUpdate()
+        self.pauseSimulation()
         
     def loadingFailed(self):
         print("Loading error")
@@ -562,7 +575,21 @@ class MainScreen(QMainWindow):
         steps = self.stepSizeSpinBox.value()
         for _ in range(steps):
             self.executor._cycleCells()
+        self.stepCount += steps
         self.possibleCellUpdate()
+
+    def startSimulation(self):
+        self.simulationTimer.start()
+        self.simulationStatusLabel.setText("Simulation: running")
+
+    def pauseSimulation(self):
+        self.simulationTimer.stop()
+        self.simulationStatusLabel.setText("Simulation: paused")
+
+    def stopSimulation(self):
+        self.simulationTimer.stop()
+        self.stepCount = 0
+        self.simulationStatusLabel.setText("Simulation: paused")
 
     def updateCellCounter(self):
         cellCount = self.executor.getCellCount()
@@ -571,16 +598,21 @@ class MainScreen(QMainWindow):
     def updateSimulationView(self):
         self.simulationImageLabel.setPixmap(QPixmap.fromImage(QImage.fromData(self.renderer.render(self.executor.cellList))))
 
+    def updateStepCount(self):
+        stepCount = self.stepCount
+        self.stepCountLabel.setText("Step: " + str(stepCount))
+
     def possibleCellUpdate(self):
         self.updateCellCounter()
         self.updateSimulationView()
+        self.updateStepCount()
 
     def stepClicked(self):
-        self.simulationTimer.stop()
+        self.pauseSimulation()
         self.simulationTimerTriggered()
 
     def clearClicked(self):
-        self.simulationTimer.stop()
+        self.stopSimulation()
         self.executor.clearCells()
         self.possibleCellUpdate()
 
