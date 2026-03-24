@@ -1,0 +1,28 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: OpenCellLab-Simulator
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Martin
+    family-names: Machala
+    orcid: 'https://orcid.org/0009-0002-6813-9431'
+repository-code: 'https://github.com/m-machala/OpenCellLab-Simulator/'
+abstract: >-
+  OCL is a cellular automata simulator written in python
+  using a modular architecture allowing it to simulate a
+  vast number of CA configurations through the use of
+  user-created modules. Its focus is to make this modular
+  system easy to use and for the modules to be easy to
+  create and share. 
+keywords:
+  - cellular automata
+  - CA
+  - simulation
+  - simulator
+  - modular
+license: MIT
