@@ -6,5 +6,6 @@
 	"package image path": "PATH",
     "package path": "PATH",
     "environment class": "ENVIRONMENT",
+    "loader class": "LOADER",
     "cell classes": ["CLASS1", "CLASS2"]
 }
