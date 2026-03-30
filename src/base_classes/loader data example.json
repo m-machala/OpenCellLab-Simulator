@@ -1,0 +1,29 @@
+{
+	"cells": [
+	{
+		"class": "CLASS1",
+        "constructor arguments": {
+            "argument1": "DATA",
+            "argument2": "DATA"
+        },
+		"data": {
+            "data1": "DATA",
+            "data2": "DATA",
+            "data3": "DATA"
+        }
+	},
+
+	{
+		"class": "CLASS1",
+        "constructor arguments": {
+            "argument1": "DATA",
+            "argument2": "DATA"
+        },
+		"data": {
+            "data1": "DATA",
+            "data2": "DATA",
+            "data3": "DATA"
+        }
+	}
+	]
+}

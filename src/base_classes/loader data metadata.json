@@ -1,0 +1,10 @@
+{
+    "package type": "loader data",
+	"package name": "PACKAGE",
+	"author name": "AUTHOR",
+	"package description": "DESCRIPTION",
+	"package image path": "PATH",
+    "package path": "PATH",
+    "environment class": "ENVIRONMENT",
+    "cell classes": ["CLASS1", "CLASS2"]
+}
