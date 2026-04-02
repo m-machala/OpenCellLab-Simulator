@@ -25,7 +25,7 @@ def validatePackageJSON(JSON):
                         output = False
         elif JSON["package type"] == "loader data":
             output = True
-            if len(JSON["cell types"]) <= 0 or ("environment type"  in JSON and JSON["environment type"] == "any"):
+            if len(JSON["cell classes"]) <= 0:
                 output = False
         else:
             if "package class" in JSON and JSON["package class"] != "":
@@ -95,13 +95,13 @@ def removeJSONsWithoutDependencies(JSONList):
     validLoaders = []
     loaderClassNames = []
     for loader in loaders:
-        if "package class" in loader and loader["package class"] != "":
+        if "package class" in loader and loader["package class"] != "" and "environment class" in loader and loader["environment class"] != "" and (loader["environment class"] in environmentClassNames or loader["environment class"] == "any"):
             validLoaders.append(loader)
             loaderClassNames.append(loader["package class"])
 
     validLoaderData = []
     for loaderDatum in loaderData:
-        if "environment class" in loaderDatum and loaderDatum["environment class"] != "" and (loaderDatum["environment class"] in environmentClassNames or loaderDatum["environment class"] == "any") and "loader class" in loaderDatum and loaderDatum["loader class"] in loaderClassNames:
+        if "environment class" in loaderDatum and loaderDatum["environment class"] != "" and loaderDatum["environment class"] in environmentClassNames and "loader class" in loaderDatum and loaderDatum["loader class"] in loaderClassNames:
             empty = True
             complete = True
             for cellClass in loaderDatum["cell classes"]:

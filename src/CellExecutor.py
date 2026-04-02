@@ -45,3 +45,6 @@ class CellExecutor:
 
     def getCellCount(self):
         return(len(self.cellList))
+    
+    def cellsChangedManually(self):
+        self._environment._cellsChangedManually()

@@ -34,6 +34,10 @@ class Environment(ABC):
     def _executorClearedCells(self):
         pass 
 
+    # This function is called when cells have been changed manually using the executor
+    def _cellsChangedManually(self):
+        pass
+
     # Used for handling the user left-clicking the simulation
     # The data variable contains data about the interactions in an arbitrary form set by the renderer
     # Please check your renderer's documentation to see what data is being passed

@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import (
     QPushButton, QListWidget, QTextEdit, QToolBar,
     QMainWindow, QCheckBox, QScrollArea, QRadioButton, 
     QButtonGroup, QSlider, QSpinBox, QSizePolicy,
-    QListWidgetItem, QSpacerItem, QStatusBar, QFrame
+    QListWidgetItem, QSpacerItem, QStatusBar, QFrame,
+    QDialog, QMessageBox
 )
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeyEvent, QPixmap, QImage, QMouseEvent, QFont
@@ -87,15 +88,17 @@ class WelcomeScreen(QMainWindow):
 
         self.reloadClicked()
 
-    def populateModuleList(self):
+    def findPackages(self):
         path = os.path.join(getFilePath(), "packages")
-        #self.welcomeLabel.setText(path)
-        packages = ModuleFinder.findPackageJSONs(path)
+        self.foundPackages = ModuleFinder.findPackageJSONs(path)
+
+    def populateModuleList(self):
+
         self.moduleListItems = []
         self.moduleList.clear()
 
-        renderers = ModuleFinder.filterJSONsByType(packages, "renderer")
-        environments = ModuleFinder.filterJSONsByType(packages, "environment")
+        renderers = ModuleFinder.filterJSONsByType(self.foundPackages, "renderer")
+        environments = ModuleFinder.filterJSONsByType(self.foundPackages, "environment")
 
         for renderer in renderers:                
             item = listItemBuilder(renderer, bold = True)
@@ -139,8 +142,7 @@ class WelcomeScreen(QMainWindow):
         self.cellList.clear()
         self.selectedCells = []
 
-        modules = ModuleFinder.findPackageJSONs(os.path.join(getFilePath(), "packages"))
-        cellPacks = ModuleFinder.filterJSONsByType(modules, "cell")
+        cellPacks = ModuleFinder.filterJSONsByType(self.foundPackages, "cell")
 
         for cellPack in cellPacks:
             if cellPack["environment class"] == selectedModule["package class"]:
@@ -163,6 +165,7 @@ class WelcomeScreen(QMainWindow):
         self.moduleInfo.setText(text)
 
     def reloadClicked(self):
+        self.findPackages()
         self.moduleList.clear()
         self.cellList.clear()
         self.unselectModule()
@@ -178,7 +181,27 @@ class WelcomeScreen(QMainWindow):
         self.cellList.clearSelection()
 
     def beginClicked(self):
-        mainScreen = MainScreen(self.selectedRenderer, self.selectedEnvironment, self.selectedCells)
+        if not self.selectedRenderer or not self.selectedEnvironment:
+            return
+        
+        loaders = ModuleFinder.filterJSONsByType(self.foundPackages, "loader")
+        loaderData = ModuleFinder.filterJSONsByType(self.foundPackages, "loader data")
+
+        loaderList = []
+        loaderDataList = []
+
+        for loader in loaders:
+            environmentClass = loader["environment class"]
+            if environmentClass == self.selectedEnvironment["package class"] or environmentClass == "any":
+                dataList = []
+                for loaderDatum in loaderData:
+                    if loaderDatum["loader class"] == loader["package class"] and loaderDatum["environment class"] == self.selectedEnvironment["package class"]:
+                        dataList.append(loaderDatum)
+                if len(dataList) > 0:
+                    loaderList.append(loader)
+                    loaderDataList.append(dataList)
+
+        mainScreen = MainScreen(self.selectedRenderer, self.selectedEnvironment, self.selectedCells, loaderList, loaderDataList)
         self.setCentralWidget(mainScreen)
         self.resize(1000, 750)
 
@@ -186,8 +209,10 @@ class WelcomeScreen(QMainWindow):
         self.close()  
 
 class MainScreen(QMainWindow):
-    def __init__(self, rendererData, environmentData, cellPackDataList):
+    def __init__(self, rendererData, environmentData, cellPackDataList, loaderList, loaderDataList):
         super().__init__()
+        self.loaderList = loaderList
+        self.loaderDataList = loaderDataList
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
         mainLayout = QHBoxLayout(centralWidget)
@@ -249,6 +274,12 @@ class MainScreen(QMainWindow):
         self.clearAction = QAction(QIcon(os.path.join(iconPath, "clear.png")), "Clear", self)
         toolbar.addAction(self.clearAction)
         self.clearAction.triggered.connect(self.clearClicked)
+
+        self.loadDataAction = QAction(QIcon(), "Load", self)
+        toolbar.addAction(self.loadDataAction)
+        self.loadDataAction.triggered.connect(self.openLoaderDialog)
+
+        toolbar.addSeparator()
 
         toolbar.addSeparator()
 
@@ -417,6 +448,7 @@ class MainScreen(QMainWindow):
         # load cell list and save cell references
         self.cellListWidget.clear()
         self.cellList = []
+        self.allCellReferences = []
         for pack in cellPackDataList:
             foundCells = ModuleFinder.loadCellPack(pack)
             if len(foundCells) == 0:
@@ -427,6 +459,7 @@ class MainScreen(QMainWindow):
             self.cellListWidget.addItem(item)
 
             for cellIndex in range(len(foundCells)):
+                self.allCellReferences.append(foundCells[cellIndex][0])
                 item = listItemBuilder(foundCells[cellIndex][1], 3)
                 self.cellListWidget.addItem(item)
                 self.cellList.append(foundCells[cellIndex])
@@ -799,6 +832,26 @@ class MainScreen(QMainWindow):
         self.releaseAllKeys(oldReceiver)
         self.simulationImageLabel.receiverChanged()
 
+    def openLoaderDialog(self):
+        # We pass self.cellList so the dialog knows exactly what cell classes the current environment has loaded
+        dialog = LoaderDialog(self.loaderList, self.loaderDataList, self.cellList, self)
+        
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            selectedLoader = dialog.selectedLoader
+            selectedData = dialog.selectedLoaderData
+            
+            loaderRef = ModuleFinder.loadLoader(selectedLoader)
+            if not loaderRef or not selectedData:
+                return
+            
+            self.clearClicked()
+
+            loaderInstance = loaderRef(self.executor, self.environment)
+            loaderInstance.load(selectedData["package path"], self.allCellReferences)
+            
+            #print(f"Executing Load: {selectedData['package name']} via {selectedLoader['package name']}")
+            self.possibleCellUpdate()
+
 
 class SimulationLabel(QLabel):
     leftClicked = pyqtSignal(int, int)
@@ -926,3 +979,125 @@ def moduleInfoBuilder(metadata):
         infoText += metadata["cell description"]
 
     return infoText
+
+class LoaderDialog(QDialog):
+    def __init__(self, loaderList, loaderDataList, availableCells, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Load Configuration")
+        self.resize(700, 500)
+        
+        self.loaderList = loaderList
+        self.loaderDataList = loaderDataList
+        self.availableCells = availableCells
+        
+        self.selectedLoader = None
+        self.selectedLoaderData = None
+        
+        self.initUI()
+        self.populateList()
+
+    def initUI(self):
+        # Change the main layout to vertical to stack the content above the buttons
+        mainLayout = QVBoxLayout(self)
+        
+        # Top section: horizontal layout for list and info side-by-side
+        topContentLayout = QHBoxLayout()
+        mainLayout.addLayout(topContentLayout)
+        
+        # Left side of top content: Unified hierarchy selection
+        selectionLayout = QVBoxLayout()
+        topContentLayout.addLayout(selectionLayout, 1)
+        
+        selectionLayout.addWidget(QLabel("Available Packages:"))
+        self.listWidget = QListWidget()
+        self.listWidget.currentItemChanged.connect(self.selectionChanged)
+        selectionLayout.addWidget(self.listWidget)
+        
+        # Right side of top content: Info box
+        infoLayout = QVBoxLayout()
+        topContentLayout.addLayout(infoLayout, 1)
+        
+        infoLayout.addWidget(QLabel("Selected Package Info:"))
+        self.infoText = QTextEdit()
+        self.infoText.setReadOnly(True)
+        infoLayout.addWidget(self.infoText)
+        
+        # Bottom section: Buttons spanning the entire width
+        buttonLayout = QHBoxLayout()
+        mainLayout.addLayout(buttonLayout)
+        
+        self.cancelButton = QPushButton("Cancel")
+        self.cancelButton.clicked.connect(self.reject)
+        buttonLayout.addWidget(self.cancelButton)
+        
+        # This stretch acts as the spacer, pushing the buttons to opposite edges
+        buttonLayout.addStretch()
+        
+        self.loadButton = QPushButton("Load")
+        self.loadButton.setDisabled(True)
+        self.loadButton.clicked.connect(self.loadClicked)
+        buttonLayout.addWidget(self.loadButton)
+
+    def populateList(self):
+        self.listItems = []
+        
+        for i, loader in enumerate(self.loaderList):
+            # Add the loader as a bold parent item
+            item = listItemBuilder(loader, bold=True)
+            self.listWidget.addItem(item)
+            self.listItems.append(("loader", loader))
+            
+            # Add the associated loader data as indented child items
+            for data in self.loaderDataList[i]:
+                dataItem = listItemBuilder(data, spaceWidth=3)
+                self.listWidget.addItem(dataItem)
+                self.listItems.append(("loader data", data))
+
+    def selectionChanged(self, item):
+        index = self.listWidget.row(item)
+        if index == -1: return
+        
+        itemType, packageData = self.listItems[index]
+        self.infoText.setText(moduleInfoBuilder(packageData))
+        
+        if itemType == "loader data":
+            self.selectedLoaderData = packageData
+            # Backtrack to find the parent loader
+            for prevIndex in range(index, -1, -1):
+                if self.listItems[prevIndex][0] == "loader":
+                    self.selectedLoader = self.listItems[prevIndex][1]
+                    break
+            self.loadButton.setEnabled(True)
+        else:
+            self.selectedLoader = packageData
+            self.selectedLoaderData = None
+            self.loadButton.setDisabled(True)
+
+    def loadClicked(self):
+        if not self.selectedLoaderData:
+            return
+            
+        # Check completeness against loaded cells in the MainScreen
+        requiredCells = self.selectedLoaderData.get("cell classes", [])
+        availableCellClasses = []
+        for cellClassRef, cellTypeData in self.availableCells:
+            if cellClassRef is not None and "cell class" in cellTypeData:
+                availableCellClasses.append(cellTypeData["cell class"])
+                
+        missingCells = [cls for cls in requiredCells if cls not in availableCellClasses]
+        
+        if missingCells:
+            msg = (f"The selected loader data is incomplete. The following cell classes are missing "
+                   f"from your current environment:\n\n{', '.join(missingCells)}\n\n"
+                   f"Do you want to load it anyway without the missing cells?")
+            reply = QMessageBox.warning(
+                self, 
+                "Incomplete Loader Data", 
+                msg, 
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+            )
+            
+            if reply == QMessageBox.StandardButton.Cancel:
+                return
+                
+        self.accept()
